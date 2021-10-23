@@ -1,0 +1,690 @@
+\documentclass[a4]{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{xcolor}
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{figures/}}
+\usepackage{graphicx}
+\title{Stochastic Calculus Notes}
+\author{Cliff}
+
+% Make prettier tables.
+\usepackage{booktabs}
+
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{units}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+
+
+%%% Custom Commands
+%---------------------------------------------------------------------------
+% Concise referencing
+\newcommand{\eqnref}[1]{\eqref{#1}}
+\newcommand{\secref}[1]{Section \ref{#1}}
+\newcommand{\figref}[1]{Figure \ref{#1}}
+\newcommand{\lemref}[1]{Lemma \ref{#1}}
+\newcommand{\corref}[1]{Corollary \ref{#1}}
+\newcommand{\thmref}[1]{Theorem \ref{#1}}
+% Real numbers
+\newcommand{\Real}[1]{\mathbb{R}^{#1}}
+% Complex numbers
+\newcommand{\Complex}[1]{\mathbb{C}^{#1}}
+% Integers
+\newcommand{\Integer}[1]{\mathbb{Z}^{#1}}
+% Rank operator
+\DeclareMathOperator{\rank}{\textnormal{rank}}
+% Vec operator
+\newcommand{\vecop}{\textnormal{vec}}
+% Norm
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+% Trace
+\newcommand{\trace}{\textnormal{tr}}
+% Range
+\newcommand{\range}{\textnormal{range}}
+% Partial derivative
+\newcommand{\pd}[2]{\dfrac{\partial #1}{\partial #2}}
+% Complete derivative
+\newcommand{\dd}[2]{\dfrac{d #1}{d #2}}
+% Complete derivative, second order
+\newcommand{\dds}[2]{\dfrac{d^2 #1}{d {#2}^2}}
+% Limit to N / N
+\newcommand{\limover}[1]{\lim_{#1 \rightarrow \infty} \dfrac{1}{#1}}
+% Display style sum
+\newcommand{\dsum}{\displaystyle\sum}
+% arg min and arg max
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg~max}}}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg~min}}}
+%---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{example}
+\newtheorem{corollary}{Corollary}
+\begin{document}
+
+\maketitle
+\section{General Probability Theory}
+\subsection{Infinite Probability Spaces}
+\begin{definition}[$\sigma-algebra$]
+Let $\Omega$ be a nonempty set, and let $\mathcal{F}$ be a collection of sub-sets of $\Omega$. We say that $\mathcal{F}$ is a $\sigma-algebra$ provided that:\par 
+\quad \par 
+(i) the empty set $\phi$ belongs to $F$\par 
+(ii) whenever a set A belongs to $F$, its complement $A^{c}$ also belongs to $\mathcal{F}$, and \par 
+(iii) whenever a sequence of sets $A_{1},A_{2},...$ belongs to F, their union $\cup^{\infty}_{n = 1}A_{n}$ also belongs to $\mathcal{F}$.\par 
+
+\end{definition}
+\bigbreak
+\begin{definition}[Probability measure]
+Let $\Omega$ be a nonempty set, and let $\mathcal{F}$ be a collection of sub-sets of $\Omega$. A probability measure $\mathbb{P}$ is a function that, to every set $A\in \mathcal{F}$, assigns a number in [0,1], called the probability of A and written $\mathbb{P}(A)$. We require:\par 
+\quad \par 
+(i) $\mathbb{P}(\Omega) = 1$, and \par 
+(ii)\textsl{(countable additivity)} whenever $A_{1},A_{2},...$ is a sequence of disjoint sets in $\mathcal{F}$, then\par 
+$$
+\mathbb{P}\left(\cup^{\infty}_{n = 1}A_{n}\right) = \sum^{\infty}_{n = 1}\mathbb{P}(A_{n})
+$$\par 
+\noindent The triple $(\Omega, \mathcal{F}, \mathbb{P})$ is called a \textbf{probability space}.
+\end{definition}
+\bigbreak
+\begin{definition}[Almost surely (a.s.)]
+Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space. If a set $A\in \mathcal{F}$ satisfies $\mathbb{P}(A) = 1$, we say that the event A occurs $\underline{\text{almost surely}}$.
+\end{definition}
+\bigbreak
+\subsection{Random variables and Distributions}
+\begin{definition}[Random variable]
+	Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space. A random variable is a real-valued function X defined on $\Omega$ with the property that for every Borel subset B of $\mathbb{R}$, the subset of $\Omega$ given by \par 
+	$$
+	\{X\in B\} = \{\omega \in \Omega;X(\omega)\in B\}
+	$$
+	is in the $sigma-algebra\quad \mathcal{F}.$ (We sometimes also permit a random variable to take the value $+\infty$ and $-\infty$)
+\end{definition}
+\bigbreak
+\begin{definition}[Distribution measure]
+	Let X be A random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$. The distribution measure of X is the probability measure $\mu_{X}$ that assigns to each Borel subsets B of $\mathbb{R}$ The mass $$\mu_{X}(B) = \mathbb{P}\{X\in B\}$$
+\end{definition}
+\begin{theorem}
+	The relationship between cdf and distribution measure\par 
+	$$
+	F(x) = \mathbb{P}\{X\leq x\} = \mu_{X}(-\infty, x], x\in \mathbb{R}
+	$$
+	$$
+	\mu_{X}(x,y] = 	\mu_{X}(-\infty,y] - 	\mu_{X}(-\infty, x] = F(y) - F(x)
+	$$
+	$$
+	\mu_{X}[a,b] = \lim_{x\rightarrow\infty}\mu_{X}(a-\frac{1}{n}] = F(b) - \lim_{n\rightarrow\infty}(a - \frac{1}{n})
+	$$
+	$$
+	\mu_{X}[a,b] = \lim_{x\rightarrow\infty}\mu_{X}(a-\frac{1}{n}]  = \mathbb{P}\{a\leq X\leq b\} = \int_{a}^{b}f(x)dx
+	$$
+\end{theorem}
+\subsection{Expectations}
+\begin{theorem}
+	Let X be a random variable on probability space $(\Omega, \mathcal{F}, \mathbb{P})$.\par 
+	\bigbreak 
+	(i) If X takes only finitely many values $y_{0}, y_{1},...,y_{n}$, then\par 
+	$$
+\int_{\Omega} X(\omega)d\mathbb{P}(\omega) = \sum^{n}_{k = 0}y_{k}\mathbb{P}\{X = y_{k}\}
+	$$\par 
+	\bigbreak 
+	(ii) \textbf{(Integrability)} The random variable X is integrable if and only if \par 
+	$$
+\int_{\Omega}|X(\omega) |d\mathbb{P}(\omega)<\infty
+	$$
+	\noindent Now let Y be another random variable\par 
+	\bigbreak 
+	(iii) \textbf{(Comparison)} If $X\leq Y$ almost surely, and if $\int_{\Omega}X(\omega)d\mathbb{P}(\omega)$ and $\int_{\Omega}Y(\omega)d\mathbb{P}(\omega)$ are defined, then\par 
+	$$
+	\int_{\Omega}X(\omega) d\mathbb{P}(\omega) \leq \int_{\Omega}Y(\omega )d\mathbb{P}(\omega)
+	$$
+	and if X = Y\par 
+	$$
+\int_{\Omega}X(\omega) d\mathbb{P}(\omega) = \int_{\Omega}Y(\omega )d\mathbb{P}(\omega)
+$$
+	\bigbreak 
+	(iv) \textbf{(Linearity)} If $\alpha$ and $\beta$ are real constants and X and Y are integrable, or if $\alpha$ and $\beta$ are nonnegative constants and X and Y are nonnegative, then \par
+	$$
+\int_{\Omega}(\alpha X(\omega) + \beta Y(\omega))d \mathbb{P}(\omega) = \alpha \int_{\Omega}X(\omega)d \mathbb{P}(\omega) + \beta \int_{\Omega}Y(\omega)d \mathbb{P}(\omega)
+	$$
+\end{theorem}
+\begin{definition}[Expectation]
+	Let X be a random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$. The expectation of X is defined to be\par 
+	$$
+\mathbb{E} = \int_{\Omega}X(\omega)d\mathbb{P}(\omega)	$$
+This definition make sense if X is integrable or $X\geq 0$ a.s.\par 
+\end{definition}
+\begin{theorem}
+	Let X be a random variable on probability space $(\Omega, \mathcal{F}, \mathbb{P})$.\par 
+	\bigbreak 
+	(i)\label{countable_add} If X takes only finitely many values $x_{0}, x_{1},...,x_{n}$, then\par 
+	$$
+	\mathbb{E}X = \sum^{n}_{k = 0}x_{k}\mathbb{P}\{X = x_{k}\}
+	$$\par 
+	\bigbreak 
+	(ii) \textbf{(Integrability)} The random variable X is integrable if and only if \par 
+	$$
+	\mathbb{E}|X|<\infty
+	$$
+	\noindent Now let Y be another random variable\par 
+	\bigbreak 
+	(iii) \textbf{(Comparison)} If $X\leq Y$ almost surely, and if $\mathbb{E}X$ and $\mathbb{E}Y$ are defined, then\par 
+	$$
+	\mathbb{E}X  \leq	\mathbb{E}Y
+	$$
+	and if X = Y\par 
+	$$
+	\mathbb{E}X  =	\mathbb{E}Y
+		$$
+	\bigbreak 
+	(iv) \textbf{(Linearity)} If $\alpha$ and $\beta$ are real constants and X and Y are integrable, or if $\alpha$ and $\beta$ are nonnegative constants and X and Y are nonnegative, then \par
+	$$
+		\mathbb{E}(\alpha X(\omega) + \beta Y(\omega))= \alpha \mathbb{E}X(\omega) + \beta \mathbb{E}Y(\omega)
+	$$
+\end{theorem}
+\begin{definition}[Lebesgue measure]
+	Let $\mathcal{B}(\mathbb{R})$ be the $\sigma-algebra$ of Borel subsets of $\mathbb{R}$. The lebesgue measure on $\mathbb{R}$, which we denote by $\mathcal{L}: \mathcal{B}(\mathbb{R})\rightarrow [0,\infty)$, assigns to each set $B\in\mathcal{B}(\mathbb{R})$ a number in $[0,+\infty)]$ or the value $\infty$ so that\par 
+	(i) $\mathcal{L}[a,b] = b - a$ whenever $a\leq b$, and\par 
+	(ii) if $B_{1}, B_{2},...$ is a sequence of disjoint sets in $\mathcal{B}(\mathbb
+	R)$, then we have the countable additivity property\par 
+	$$
+	\mathcal{L} \left(\cup_{n = 1}^{\infty}B_{n}\right) = \sum^{\infty}_{n = 1}\mathcal{L}(B_{n})
+	$$
+\end{definition}
+\begin{definition}[Borel measurable]
+Let f(x) be a real-valued function defined on $\mathbb{R}$. If and only if for every Borel subsets B of $\mathbb{R}$, the set \{$x; f(x)\in B$\} is also a Borel subset B of $\mathbb{R}$. The function $f(x)$ is called Borel-measurable.
+\end{definition}
+\begin{theorem}[Comparsion of Riemann and Lebesgue intergals]
+	\quad  \bigbreak
+	(i) The Riemann intergal is defined iff the point where $f(x)$ is not continuous has Lebesgue measure equals zero.\par 
+	(ii) If the Riemann intergal is defined then the Riemann and Lebesgue integral agree.\par 
+	
+\end{theorem}
+\subsection{Convergence of Integrals}
+\begin{definition}[Converge almost surely]
+	\quad \bigbreak 
+	Let $X_{1}, X_{2},...$ be a sequence of r.v.s defined on the same on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, we say  $X_{1}, X_{2},...$ converge to another r.v. X a.s if and only if \par 
+	$$
+	\mathbb{P}(\omega\in \Omega ; \lim_{n = 0}^{\infty}X_{n}(\omega)= X(\omega)) = 1
+	$$
+	or 
+	$$
+	\forall \varepsilon>0, \quad \quad \mathbb
+	P(\lim_{n\rightarrow \infty} |X_{n}(\omega)-X(\omega)|>\varepsilon ) = 0
+	$$
+\end{definition}
+\begin{example}[Law of Large Numbers]
+	\quad \par 
+	$$
+	\begin{aligned}
+	X_{1}, X_{2}, ...,X_{n}\sim F_{X}(x)\\
+	E(X) = \mu
+	\end{aligned}
+	$$\par 
+	WLLN-$\bar X \rightarrow^{p}\mu$ $\Leftrightarrow \lim_{n\rightarrow\infty}\mathbb{P}(|\bar X-\mu|>\varepsilon) = 0$\par 
+	\quad \par 
+	SLLN-$\bar X \rightarrow^{a.s.}\mu$ $\Leftrightarrow \mathbb{P}(\lim_{n\rightarrow\infty}|\bar X-\mu|>\varepsilon) = 0$\par 
+
+\end{example}
+\begin{theorem}[Converge almost every]
+	\quad \par \bigbreak
+	Let $f_{1}, f_{2},...$ be a sequence of real-valued, Borel-measurable functions defined on $\mathbb{R}$. Let $f$ be another real-valued, Borel-measurable function defined on $\mathbb{R}$, we say $f_{1}, f_{2},...\rightarrow f $ a.e. \par 
+	$$
+	\lim_{n\rightarrow \infty}f_{n} = f \quad a.e.
+	$$
+	if and only if $$
+	\forall \varepsilon>0, \quad \quad \mathcal{L}(\lim_{n\rightarrow \infty} |f_{n}(x)-f(x)|>\varepsilon ) = 0
+	$$
+\end{theorem}
+\begin{example}
+	Let $f_{n} = \frac{n}{2\pi}e^{-\frac{nx^{2}}{2}}$, and it is easy to see f is a pdf of normal with $\frac{1}{n}$ variance.\par 
+	Obviously, given $f(x) = 0$
+	$$
+	\mathcal{L}(\lim_{n\rightarrow \infty}f_{n}(x)\rightarrow 0) = 1
+	$$
+	and 
+	$$
+		\mathcal{L}(\lim_{n\rightarrow \infty}\int^{+\infty}_{-\infty}f_{n}(x) dx\rightarrow 1) = 1
+	$$
+	however, we know $\int^{+\infty}_{-\infty} f(x) dx = 0$, so we can conclude\par 
+	$$
+\lim_{n\rightarrow \infty}\int^{+\infty}_{-\infty}f_{n}(x) dx \neq \int^{+\infty}_{-\infty}\lim_{n\rightarrow \infty}f_{n}(x) dx\quad (a.e.)
+	$$
+\end{example}
+\begin{theorem}[Montone convergence]
+	\quad \par \bigbreak 
+	Let $X_{1}, X_{2},...$ be a sequence of r.v.s converging almost surly to another r.v. X. If \par 
+	$$
+	0\leq X_{1}\leq X_{2}\leq ... \quad a.s.,
+	$$
+	then
+	$$
+	\lim_{n\rightarrow \infty}\mathbb{E}X_{n} = \mathbb{E}X
+	$$
+		\quad \par \bigbreak 
+	Let $f_{1}, f_{2},...$ be a sequence of Borel-measurable functions converging almost surly to another Borel-measurable function f. If \par 
+	$$
+	0\leq f_{1}\leq f_{2}\leq ... \quad a.e.,
+	$$
+	then
+	$$
+	\lim_{n\rightarrow \infty}\int_{-\infty}^{\infty}f_{n}dx = \int_{-\infty}^{\infty} f dx
+	$$
+\end{theorem}
+Recall countable additivity in (i) of Thm. \ref{countable_add}\par 
+\begin{corollary}
+	Suppose the nonegative random r.v. X takes countable many values $x_{0},x_{1},...$ Then\par 
+	$$
+	\mathbb{E}X = \sum^{\infty}_{k = 0}x_{k}\mathbb{P}(X = x_{k})
+	$$
+\end{corollary}
+\begin{theorem}[Dominated convergence]
+		\quad \par \bigbreak 
+	Let $X_{1}, X_{2},...$ be a sequence of r.v.s converging almost surly to another r.v. X. If  there is another r.v. Y such that $\mathbb{E}Y<\infty$ and $|X_{n}|\leq Y$ a.s., then \par 
+
+	$$
+	\lim_{n\rightarrow \infty}\mathbb{E}X_{n} = \mathbb{E}X
+	$$
+	\quad \par \bigbreak 
+	Let $f_{1}, f_{2},...$ be a sequence of Borel-measurable functions converging almost surly to another Borel-measurable function f.\par  If there is another function $g(x)$ such that $\int^{\infty}_{-\infty}g(x)<\infty$ and $|f_{n}(x)|\leq g(x)$ a.e., then\par 
+
+	$$
+	\lim_{n\rightarrow \infty}\int_{-\infty}^{\infty}f_{n}dx = \int_{-\infty}^{\infty} f dx
+	$$
+\end{theorem}
+\subsection{Computation of Expectations}
+\begin{theorem}\quad \par 
+	Let X be a random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ and let g be a Borel-measurable function on $\mathbb{R}$. Then if\par 
+	$$
+	\mathbb{E}|g(X)| = \int_{\mathbb{R}}|g(X)| d\mu_{X}(x)<\infty,
+	$$
+
+	$$
+	\mathbb{E}g(X) = \int_{\mathbb{R}}g(X)d\mu_{X}(x)
+	$$
+\end{theorem}
+\begin{proof}
+\noindent Recall the definition of expectation $\mathbb{E} = \int_{\Omega}X(\omega)d\mathbb{P}(\omega)$ we should proof the integral w.r.t distribution measure gives the same result as integral w.r.t. probability measure on $\Omega$.\par 
+\bigbreak 
+\noindent Step 1: Indicator function\par
+$$
+\begin{aligned}
+\mathbb{E}\mathbb{I}_{B}(X) &= \int_{\Omega}\mathbb{I}_{B}(X(\omega))d\mathbb{P}(\omega)\\
+ &= 0\cdot\int_{B_{c}}d\mathbb{P}(\omega) + 1\cdot\int_{B}d\mathbb{P}(\omega) \\
+  &= \mathbb{P}\{X\in B\} = \mu_{X}(B)\\
+ \text{in another side,} \\
+\int_{\mathbb{R}}\mathbb{I}_{B}(x)d\mu_{X}(x) &= 0\cdot \int_{x\notin B}d\mu_{X}(x) + 1\cdot \int_{x\in B}d\mu_{X}(x)\\
+& = \mu_{X}(B)
+\end{aligned}
+$$
+\bigbreak 
+
+\noindent Step 2: Nonnegative simple functions\par 
+\bigbreak 
+Given a simple function $g(x)$\par 
+$$
+g(x) = \sum^{n}_{k = 1}\alpha_{k}\mathbb{I}_{B_{k}}(x),
+$$
+$$
+\mathbb{E}g(X) = \mathbb{E}\sum_{k = 1}^{n}\alpha_{k}\mathbb{I}_{B_{k}}(x) = \sum_{k = 1}^{n}\alpha_{k}\mathbb{E}\mathbb{I}_{B_{k}}
+$$
+use conclusion from step 1, it holds in simple nonnegative function.\par
+\noindent Step 3: Nonnegative Borel-measurable function\par
+\bigbreak 
+Define Borel-sets $B = \{x; \frac{k}{2^{n}}\leq g(x)<\frac{k+1}{2^{n}}\}, k = 0, 1,2,...,4^{n} - 1$\par Then we have a partition \par 
+$$
+0<\frac{1}{2^{n}}<\frac{2}{2^{n}}<...<\frac{4_{n}}{2^{n}} = 2^{n}
+$$
+we can see the range of partition goes to infinite.\par 
+From this construction we can get a simple function \par 
+$$
+g_{n}(x) = \sum^{4^{n} - 1}_{k = 0}\frac{k}{2^{n}}\mathbb{I}_{B_{k,n}}(x)
+$$
+satisfy $0\leq g_{1}\leq g_{2}\leq ...\leq g_{n}$, and from step 2, we know \par 
+$$
+\mathbb{E}g_{n}(X) = \int_{\mathbb{R}}g_{n}(x)d\mu_{X}(x)
+$$
+Using MCT, we have $$
+\int_{\mathbb{R}}g(x)d\mu_{X}(x) = \lim_{n\rightarrow\infty}\int_{\mathbb{R}}g_{n}(x)d\mu_{X}(x) = \lim_{n\rightarrow\infty} \mathbb{E}g_{n}(x) = \mathbb{E}\lim_{n\rightarrow\infty} g_{n}(x) = \mathbb{E}g(X)
+$$
+\begin{figure}
+	\centering
+%	\includegraphics[width=1.2\linewidth]{../../../../OneDrive/图片/Scans/Scan_20201002}
+	\caption{Step 3}
+	\label{fig:scan20201002}
+\end{figure}
+\par \bigbreak 
+\noindent Step 4: General Borel-measurable function\par 
+\bigbreak
+Let $g(x)$ be a general Borel-measurable function,\par 
+$$
+g^{+}(x) = max\{g(x),0\}\quad and \quad g^{-} = max\{-g(x),0\}
+$$
+$$
+\begin{aligned}
+\mathbb{E}g^{+}(x) &= \int_{\mathbb{R}}g^{+}(x)d\mu_{X}(x)<\infty,\\
+\mathbb{E}g^{-}(x) &= \int_{\mathbb{R}}g^{-}(x)d\mu_{X}(x)<\infty,
+\end{aligned}
+$$
+In the end by linearity,
+$$
+\mathbb{E}g(x)  = \mathbb{E}g^{+}(x)  - \mathbb{E}g^{-}(x) 
+$$
+\end{proof}
+\begin{theorem}
+	Let X be a random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, and let g be a Borel-measurable function on $\mathbb
+	R$. Suppose that X has a density f ($\mu_{X}(B) = \int_{B}f(x)dx$). Then if \par 
+	$$
+	\mathbb{E}|g(X)| = \int^{\infty}_{-\infty}|g(x)|f(x)dx<\infty
+	$$
+	is finite and well-defined,\par 
+		$$
+	\mathbb{E}g(X) = \int^{\infty}_{-\infty}g(x)f(x)dx
+	$$
+\end{theorem}
+\subsection{Change of measure}
+\begin{theorem}
+	\quad \bigbreak 
+	Let  $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space and let Z be: (i) $\mathbb{P}\{Z>0\}=0$; (ii)$\mathbb{E}Z = 1$. For $A\in\mathcal{F}$, define\par 
+	$$
+	\tilde{\mathbb{P}}(A) = \int_{A}Z(\omega)d\mathbb{P}(\omega)
+	$$
+	Then $\tilde{\mathbb{P}}$ is a probability measure. Furthermore, if X is a nonnegative random variable, then \par 
+	$$
+	\tilde{\mathbb{E}}X = \mathbb{E}[XZ]
+	$$
+	If Z is almost surly strictly positive, we also have\par 
+	$$
+	\mathbb{E}Y = \tilde{\mathbb{E}}\left[\frac{Y}{Z}\right]
+	$$
+	for every nonnegative random variable Y.\par 
+\end{theorem}
+\begin{definition}[Measure equivalent]
+	\quad \par \bigbreak
+	Let $\Omega$ be a nonempty set and $\mathcal{F}$ a $\sigma-algebra$ of subsets of $\Omega$. Two probability measures $\mathbb{P}$ and $\tilde{\mathbb{P}}$ on $(\Omega, \mathcal{F})$ are said to be equivalent if they agree which sets in $\mathcal{F}$ have probability zero.
+\end{definition}
+\begin{definition}[Radon-Nikodym derivative]
+	\quad \bigbreak 
+Let  $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, let $\tilde{\mathbb{P}}$ be another probability measure on $(\Omega, \mathcal{F})$ that is equivalent to $\mathbb{P}$, and let Z be an almost surly positive random variable that relates $\mathbb{P}$ and $\tilde{\mathbb{P}}$ via $$\tilde{\mathbb{P}}(A) = \int_{A}Z(\omega)d\mathbb{P}(\omega)$$ Then Z is called the Radon-Nikodym derivative of $\tilde{\mathbb{P}}$ w.r.t $\mathbb{P}$, and we write\par 
+$$
+Z = \frac{d\tilde{\mathbb{P}}}{d\mathbb{P}}
+$$
+\end{definition}
+\begin{theorem}[Radon-Nikodym]Let $\mathbb{P}$ and $\tilde{\mathbb{P}}$ be equivalent probability measures defined on $(\Omega, \mathcal{F})$. Then there exists an almost surly positive random variable Z such that $\mathbb{E}Z = 1$ and $$\tilde{\mathbb{P}} = \int_{A}Z(\omega)d\mathbb{P}(\omega) \quad \text{for every $A\in \mathcal{F}$}
+	$$
+\end{theorem}
+\section{Information and Conditioning}
+\subsection{Information and $\boldsymbol{\sigma-algebra}$}
+\begin{definition}[Filtration]
+	\quad \par
+	\bigbreak 
+	Let $\Omega$ be a nonempty set. Let T be a fixed positive number, and assume that for each $t\in[0,T]$ there is a $\sigma-algebra\quad \mathcal{F}(t)$. Assume further that if $s\leq t$, then every set in $\mathcal{F}(s)$ is also in $\mathcal{F}(t)$. Then we call the collection of $\sigma-algebras\quad \mathcal{F}(t),0\leq t\leq T$, a filtration.\par 
+	$$
+	\mathcal{F}(t_{1})\subset 	\mathcal{F}(t_{2})\subset 	\mathcal{F}(t_{3})...,\quad \text{for }t_{1}\leq t_{2}\leq ...
+	$$
+\end{definition}
+\begin{definition}[$\sigma(X)$]
+	\quad \par \bigbreak
+	Let X be a random variable defined on a nonempty sample space $\Omega$. The $\sigma-algebra$ generated by X, denoted $\sigma(X)$, is the collection of all subsets of $\Omega$ of the form $\{X\in B\}$, where B ranges over the Borel subsets $\mathbb
+	R$, $\mathcal{B}(\mathbb{R})$.
+\end{definition}
+\begin{definition}[$\mathcal{G}-measurable$]
+$$
+	\begin{aligned}
+&\text { Let } X \text { be a random variable defined on a nonempty sample}\\
+&\text {space } \Omega . \text {Let } \mathcal{G} \text { be a } \sigma \text {-algebra of subsets of } \Omega . \text {If every set in } \sigma(X) \text { is also in }\\
+&\mathcal{G}, \text { we say that } X \text { is } \mathcal{G} \text { -measurable. And can be written as:}
+\end{aligned}
+$$
+$$
+\sigma(X)\subset \mathcal{G}
+$$
+\end{definition}
+\begin{definition}[Adapted stochastic process]
+	\quad \par 
+	\bigbreak 
+\noindent Let $\Omega$ be a nonempty sample space equipped with a filtration $\mathcal{F}(t), 0 \leq t \leq T .$ Let $X(t)$ be a collection of random variables indexed by
+	$t \in[0, T] .$ We say this collection of random variables is an adapted stochastic process if, for each $t,$ the random variable $X(t)$ is $\mathcal{F}(t)-m e a s u r a b l e .$
+\end{definition}
+\subsection{Independence}
+\begin{definition}[Independence of two $\sigma$-algebras]\par \bigbreak 
+	Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, and let $\mathcal{G}$ and $\mathcal{H}$ be $s u b-\sigma-a l g e b r a s$ of $\mathcal{F}(i . e .,$ the sets in $\mathcal{G}$ and the sets in $\mathcal{H}$ are also in $\mathcal{F}) . W e$ say these two $\sigma$ -algebras are independent under probability measure $\mathbb{P}$ if
+	$$
+	\mathbb{P}(A \cap B)=\mathbb{P}(A) \cdot \mathbb{P}(B) \text { for all } A \in \mathcal{G}, B \in \mathcal{H}
+	$$
+	Let $X$ and $Y$ be random variables on $(\Omega, \mathcal{F}, \mathbb{P}) .$ We say these two random variables are independent if the $\sigma$-algebras they generate, $\sigma(X)$ and $\sigma(Y)$, are independent. We say that the random variable $X$ is independent of the $\sigma$ -algebra $\mathcal{G}$ if $\sigma(X)$ and $\mathcal{G}$ are independent.
+	$$
+	\mathbb{P}(A \cap B)=\mathbb{P}(A) \cdot \mathbb{P}(B) \text { for all } A \in \sigma (X), B \in \sigma(Y)
+	$$
+\end{definition}
+\begin{definition}[General case in Independence]
+	$\operatorname{Let}(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space and let $\mathcal{G}_{1}, \mathcal{G}_{2}, \mathcal{G}_{3}, \ldots$.
+	be a sequence of sub- $\sigma$ -algebras of $\mathcal{F}$. For a fixed positive integer $n,$ we say $y$. that the $n$ $\sigma$-algebras $\mathcal{G}_{1}, \mathcal{G}_{2}, \ldots, \mathcal{G}_{n}$ are independent if
+	$$
+	\begin{aligned}
+	\mathbb{P}\left(A_{1} \cap A_{2} \cap \cdots \cap A_{n}\right)=\mathbb{P}\left(A_{1}\right) \cdot \mathbb{P}\left(A_{2}\right) \cdots & \cdots \mathbb{P}\left(A_{n}\right) \\
+	\text { for all } A_{1} \in \mathcal{G}_{1}, A_{2} \in \mathcal{G}_{2}, \ldots, A_{n} \in \mathcal{G}_{n}
+	\end{aligned}
+	$$
+	Let $X_{1}, X_{2}, X_{3}, \ldots$ be a sequence of random variables on $(\Omega, \mathcal{F}, \mathbb{P}) .$ We say the $n$ random variables $X_{1}, X_{2}, \ldots, X_{n}$ are independent if the $\sigma$-algebras $\sigma\left(X_{1}\right)$ $\sigma\left(X_{2}\right), \ldots, \sigma\left(X_{n}\right)$ are independent. We say the full sequence of $\sigma$-algebras $\mathcal{G}_{1}, \mathcal{G}_{2}, \mathcal{G}_{3}, \ldots$ is independent if, for every positive integer $n,$ the $n$ $\sigma$-algebras $\mathcal{G}_{1}, \mathcal{G}_{2}, \ldots, \mathcal{G}_{n}$ are independent. We say the full sequence of random variables $X_{1}, X_{2}, X_{3}, \ldots$ is independent if, for every positive integer $n,$ the $n$ random variables $X_{1}, X_{2}, \ldots, X_{n}$ are independent.
+\end{definition}
+\begin{theorem}
+Let $X$ and $Y$ be independent random variables, and let $f$ and $g$ be Borel-measurable functions on $\mathbb{R} .$ Then $f(X)$ and $g(Y)$ are independent random variables.\par 
+\bigbreak 
+For two Borel-measurable functions, their value are independent iff their independent variable are independent.
+\end{theorem}
+\begin{proof}
+	$\forall A\in \sigma(X), A = \{\omega\in \Omega;X(\omega)\in C \}$\par \bigbreak 
+	$\forall A\in \sigma(f(X)), A = \{\omega\in \Omega; f(X(\omega))\in E\}$\par \bigbreak 
+	Since we have $C
+	= \{X\in \mathbb{R}; f(X)\in E\}$, $A\in \sigma(X)\Rightarrow \sigma(f(X))\subset \sigma(X)$. \par \bigbreak 
+	\noindent Let $B$ be in the $\sigma$-algebra generated by $g(Y) .$ This $\sigma$ -algebra is a sub $\sigma$ -algebra of $\sigma(Y),$ so $B \in \sigma(Y) .$ since $X$ and $Y$ are independent, we have $\mathbb{P}(A \cap B)=\mathbb{P}(A) \cdot \mathbb{P}(B)$
+\end{proof}
+\begin{definition}[Joint Distribution]
+	Let $X$ and $Y$ be random variables. The pair of random variables $(X, Y)$ takes values in the plane $\mathbb{R}^{2},$ and the joint distribution measure of $(X, Y)$ is given $by$
+	$$\mu_{X, Y}(C)=\mathbb{P}\{(X, Y) \in C\}\quad\text{for all Borel sets} \quad C \subset \mathbb{R}^{2}$$\par \bigbreak 
+	\noindent This is a probability measure (i.e., a way of assigning measure between 0 and
+	1 to subsets of $\mathbb{R}^{2}$ so that $\mu_{X, Y}\left(\mathbb{R}^{2}\right)=1$ and the countable additivity property The joint cumulative distribution function of $(X, Y)$ is
+	$$
+	F_{X, Y}(a, b)=\mu_{X, Y}((-\infty, a] \times(-\infty, b])=\mathbb{P}\{X \leq a, Y \leq b\}, a \in \mathbb{R}, b \in \mathbb{R}
+	$$\par \bigbreak 
+\noindent We say that a nonnegative, Borel-measurable function $f_{X, Y}(x, y)$ is a joint density for the pair of random variables $(X, Y)$ if
+$$\mu_{X, Y}(C)=\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \mathbb{I}_{C}(x, y) f_{X, Y}(x, y) d y d x$$ for all Borel sets $C \subset \mathbb{R}^{2}$
+\end{definition}
+\begin{definition}[Joint density function]
+	We say that a nonnegative, Borel-measurable functioon $f_{X,Y}(x,y)$ is a joint density for the pair of random variables (X,Y) if
+	$$
+	\mu_{X, Y}(C)=\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \mathbb{I}_{C}(x, y) f_{X, Y}(x, y) d y d x \text { for all Borel sets } C \subset \mathbb{R}^{2}
+	$$
+	Condition holds iff 
+	$$
+	F_{X, Y}(a, b)=\int_{-\infty}^{a} \int_{-\infty}^{b} f_{X, Y}(x, y) d y d x \text { for all } a \in \mathbb{R}, b \in \mathbb{R}
+	$$
+\end{definition}
+\begin{theorem}
+	\noindent Let X and Y be random variables. The following conditions are equivalent.\par 
+	\bigbreak 
+	\text { (i) } X \text { and } Y \text { are independent. }\par 
+	\bigbreak
+	(ii) The joint distribution measure factors:\par 
+	$$
+	\mu_{X, Y}(A \times B)=\mu_{X}(A) \cdot \mu_{Y}(B) \text { for all Borel subsets } A \subset \mathbb{R}, B \subset \mathbb{R}
+	$$
+	\par \bigbreak 
+	(iii) The joint cumulative distribution factors:\par 
+	$$
+	F_{X, Y}(a, b)=F_{X}(a) \cdot F_{Y}(b) \text { for all } a \in \mathbb{R}, b \in \mathbb{R}
+	$$
+	\bigbreak 
+	(iv) The joint moment-generating function factors:\par 
+	$$
+	\mathbb{E} e^{u X+v Y}=\mathbb{E} e^{u X} \cdot \mathbb{E} e^{v Y}
+	$$
+	$\text { for all } u \in \mathbb{R}, v \in \mathbb{R} \text { for which the expectations are finite.}$\par 
+	\textbf{If there is a joint density, each of the conditions above is equivalent to the following.}\par 
+	\bigbreak
+	(iv) The joint density factors:\par 
+	$$
+	f_{X, Y}(x, y)=f_{X}(x) \cdot f_{Y}(y) \text { for almost every } x \in \mathbb{R}, y \in \mathbb{R}
+	$$
+	\textbf{The conditions above imply but are not equivalent to the following.}
+	(vi) The expectation factors:
+	$$
+	\begin{array}{c}
+	\mathbb{E}[X Y]=\mathbb{E} X \cdot \mathbb{E} Y, \\
+	\text {provided } \mathbb{E}|X Y|<\infty
+	\end{array}
+	$$
+\end{theorem}
+\subsection{Discrete-Time Martingale}
+\begin{definition}[Martingale]\par 
+\bigbreak
+$\left\{X_{n}, n \geq 0\right\}$ is a martingale (or sub- or super-martingale) w.r.t. $\left\{\mathcal{F}_{n}\right\}$ if \par 
+1. $E\left|X_{n}\right|<\infty$\par
+2. $\left\{X_{n}\right\}$ is adapted to $\left\{\mathcal{F}_{n}\right\}$\par
+3. $E\left(X_{n+1} \mid \mathcal{F}_{n}\right)=X_{n}$ (or $\geq X_{n}$ or $\left.\leq X_{n}\right)$ for all $n$\par
+\end{definition}
+\begin{example}[Doob's martingale]\par
+	Let Z be a r.v with $E(|Z|)<\infty$, and $Y_{n} = E(Z|\mathcal{F}_{n})$, we have $Y_{n}$ is a martingale.\par 
+	\begin{proof}\quad \par 
+		1.
+		\begin{equation}
+		E(|Y_{n}|) = E(|E(Z|\mathcal{F}_{n-1})|)\leq E(E(|Z||\mathcal{F}_{n-1})) = E(||Z|)<\infty
+		\end{equation}\par
+		2. \begin{equation}
+		Y_{n}\in \mathcal{F}_{n}
+		\end{equation}\par 
+		3. 
+		\begin{equation}
+		E(Y_{n+1}|\mathcal{F}_{n}) = E(E(Z|\mathcal{F}_{n+1})|\mathcal{F}_{n}) = E(Z|\mathcal{F}_{n}) = Y_{n}
+		\end{equation}
+	\end{proof}
+\end{example}
+\begin{theorem}[Doob's decomposition theorem]
+	$\left\{Y_{n}\right\}$ is a submartingale, then
+	$$
+	Y_{n}=Y_{0}+M_{n}+A_{n}, \quad n \geq 0
+	$$
+	$$
+Y_{n} = Y_{0} + \sum^{n}_{k = 1}(Y_{k} - Y_{k-1})
+	$$
+	$$
+Y_{0}+\sum_{k=1}^{n}\left(Y_{k}-E\left(Y_{k} \mid \mathcal{F}_{k-1}\right)\right)+\sum_{k=1}^{n}\left(E\left(Y_{k} \mid \mathcal{F}_{k-1}\right)-Y_{k-1}\right)
+	$$
+	where\par 
+	$\bullet M_{n}$ is a martingale with $M_{0}=0$\par 
+	$\bullet A_{n}$ is an increasing predictable process with $A_{0}=0$\par 
+	$\bullet$This decomposition is unique.\par 
+	
+\end{theorem}
+\section{Brownian Motion}
+\subsection{Reflection Principle}
+\begin{theorem}[Reflecion Equality]
+	$$
+	P(W(t)<\omega, \tau_{m}<t) = P(W(t)>2m-\omega)
+	$$
+\end{theorem}
+\begin{proof}[Reflection Equality]
+$$
+\begin{aligned}
+	P(W(t)>2m - \omega) =& P(W(t)>2m - \omega|\tau_{m}<t)P(\tau_{m}<t) \\
+	&+ P(W(t)>2m - \omega|\tau_{m}\geq t)P(\tau_{m}\geq t)
+\end{aligned}
+$$
+where $P(W(t)>2m - \omega|\tau_{m}\geq t)P(\tau_{m}\geq t) = 0$\\
+So, $$
+\begin{aligned}
+	P(W(t)>2m - \omega) =& P(W(t)>2m - \omega|\tau_{m}<t)P(\tau_{m}<t)\\
+	&=P(W(t)<\omega |\tau_{m}<t)P(\tau_{m}<t)[Reflection]\\
+	&=	P(W(t)<\omega, \tau_{m}<t)
+\end{aligned}
+	$$
+\end{proof}
+\subsection{Stochastic Calculus}
+\subsubsection{$It\hat o$ Integrals}
+Define an function $f:f(x,y)$ and its difference $df(x,y)$,\par 
+\begin{equation}
+\begin{aligned}
+d f=& f_{x}dx + f_{y}dy \\
+&+ \frac{1}{2}f_{xx}dx dx + f_{xy}dxdy + \frac{1}{2}f_{yy}dy dy  \\
+&+ \frac{1}{3!}f_{xxx}(dx)^{3}+\frac{2}{3!}f_{xxy}dx dx dy+\frac{2}{3!}f_{xyy}dx dy dy  + \frac{1}{3!}f_{yyy}(dy)^{3} + ...
+\end{aligned}
+\end{equation}\par 
+if $x,y$ are continuous differentiate functions, $(dx)^{2},dxdy,(dy)^{2} = 0$,\\
+\par 
+if $x$ is an $It\hat o$ process and $y$ is a continuous differentiate function, $dxdy,(dy)^{2} = 0$ and $(dx)^{2}\neq 0$\\
+\par 
+if $x,y$ are  $It\hat o$ processes, $(dx)^{2},dxdy,(dy)^{2} \neq 0$\\
+\par 
+\noindent And $(dx)^{3},(dy)^{3},(dxdxdy),(dxdydy)=0$ in all three above cases.\\
+\par 
+\subsubsection{BSM partial differential equation}\par 
+Considering a hedging portfolio $X(t)$ with stock and money account, and an option $c(t,S_{t})$.
+\par 
+Assume the underlying stock is $S_{t}$ and its dynamics defined as fellows,\par 
+\begin{equation}
+dS_{t} = \alpha S_{t} dt + \sigma S_{t}dW_{t}
+\end{equation}
+then let's denote the stocks holding at t,\par 
+\begin{equation}
+	dX_{t} =\underbrace{ \Delta_{t}dS_{t} }_{\text{ Earnings from the stock price }}+ \underbrace{ r(X_{t}-\Delta _{t}S_{t})dt }_{\text{ Earnings from the money account}}
+\end{equation}\par 
+We can get and pde that \par 
+\begin{equation}
+d(e^{-rt}X_{t}) = d(e^{-rt}c(t,S_{t}))
+\end{equation}
+and combing the \textbf{initial condition} $X_{0}=c(0,S_{0})$,
+\begin{equation}
+X_{T} =X_{0} + \int_{0}^{T}d(e^{-rt}X_{t})  = c(0,S_{0}) + \int_{0}^{T}d(e^{-rt}c(t,S_{t})) = c(t,S_{t})
+\end{equation}\par 
+Finally, we can compute $d(e^{-rt}X_{t})= d(e^{-rt}c(t,S_{t}))$\par 
+$$
+d(e^{-rt}X_{t}) = \Delta _{t}\left[(\alpha - r)e^{-rt}S_{t}dt+\sigma e^{-rt}S_{t}dW_{t}\right]
+$$
+
+ \par
+\begin{equation}
+\begin{aligned}
+&d(e^{-rt}X_{t})=\Delta _{t}\left[(\alpha - r)e^{-rt}S_{t}dt+\sigma e^{-rt}S_{t}dW_{t}\right]\\
+&=\Delta_{t}d(e^{-rt}S_{t})=d(e^{-rt}c(t,S_{t}))\\
+&=e^{-rt}\left[-rc(t,S_{t}) + c_{t}(t,S_{t})+\alpha S_{t}c_{x}(t,S_{t})+\frac{1}{2}\sigma^{2}S^{2}_{t}c_{xx}(t,S_{t})\right]dt\\
+& +e^{-rt}\sigma S_{t}c_{x}(t,S_{t})dW_{t}
+\end{aligned}
+\end{equation}\par 
+we can simplify the equation as \par 
+\begin{equation}
+\begin{aligned}
+&\Delta _{t}\left[(\alpha - r)e^{-rt}S_{t}dt+\sigma e^{-rt}S_{t}dW_{t}\right]\\
+&=e^{-rt}\left[-rc(t,S_{t}) + c_{t}(t,S_{t})+\alpha S_{t}c_{x}(t,S_{t})+\frac{1}{2}\sigma^{2}S^{2}_{t}c_{xx}(t,S_{t})\right]dt\\
+& +e^{-rt}\sigma S_{t}c_{x}(t,S_{t})dW_{t}
+\end{aligned}
+\end{equation}
+The above equation means we can hedge the underlying randomness through holding $c_{x}(t,S_{t})$ shares of underlying, which is $\Delta_{t}=c_{x}(t,S_{t})$\\
+\par 
+after substitute the $c_{x}(t,S_{t})$ into $\Delta_{t}$ and cancel $dW_{t}$ terms,\par
+\begin{equation}
+\begin{aligned}
+&c_{x}(t,S_{t})\left[(\alpha - r)e^{-rt}S_{t}dt\right]\\
+&=e^{-rt}\left[-rc(t,S_{t}) + c_{t}(t,S_{t})+\alpha S_{t}c_{x}(t,S_{t})+\frac{1}{2}\sigma^{2}S^{2}_{t}c_{xx}(t,S_{t})\right]dt\\
+\end{aligned}
+\end{equation}
+becomes
+\begin{equation}
+\begin{aligned}
+&-rS_{t}c_{x}(t,S_{t})dt\\
+&=\left[-rc(t,S_{t}) + c_{t}(t,S_{t})+\frac{1}{2}\sigma^{2}S^{2}_{t}c_{xx}(t,S_{t})\right]dt\\
+\end{aligned}
+\end{equation}
+we reformat it and get the \textsl{Black-Scholes-Merton Equation}.
+\begin{equation}
+-rc(t,S_{t})=rS_{t}c_{x}(t,S_{t})+ c_{t}(t,S_{t})+\frac{1}{2}\sigma^{2}S^{2}_{t}c_{xx}(t,S_{t})
+\end{equation}
+with \textbf{terminal condition} $c(T,x)=(x-K)^{+}$.\par 
+
+\end{document}

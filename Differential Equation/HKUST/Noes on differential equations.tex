@@ -1,0 +1,209 @@
+\documentclass[a4]{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{xcolor}
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{figures/}}
+
+\title{Notes on differential equation}
+\author{Cliff}
+
+% Make prettier tables.
+\usepackage{booktabs}
+
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{units}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+
+
+%%% Custom Commands
+%---------------------------------------------------------------------------
+% Concise referencing
+\newcommand{\eqnref}[1]{\eqref{#1}}
+\newcommand{\secref}[1]{Section \ref{#1}}
+\newcommand{\figref}[1]{Figure \ref{#1}}
+\newcommand{\lemref}[1]{Lemma \ref{#1}}
+\newcommand{\corref}[1]{Corollary \ref{#1}}
+\newcommand{\thmref}[1]{Theorem \ref{#1}}
+% Real numbers
+\newcommand{\Real}[1]{\mathbb{R}^{#1}}
+% Complex numbers
+\newcommand{\Complex}[1]{\mathbb{C}^{#1}}
+% Integers
+\newcommand{\Integer}[1]{\mathbb{Z}^{#1}}
+% Rank operator
+\DeclareMathOperator{\rank}{\textnormal{rank}}
+% Vec operator
+\newcommand{\vecop}{\textnormal{vec}}
+% Norm
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+% Trace
+\newcommand{\trace}{\textnormal{tr}}
+% Range
+\newcommand{\range}{\textnormal{range}}
+% Partial derivative
+\newcommand{\pd}[2]{\dfrac{\partial #1}{\partial #2}}
+% Complete derivative
+\newcommand{\dd}[2]{\dfrac{d #1}{d #2}}
+% Complete derivative, second order
+\newcommand{\dds}[2]{\dfrac{d^2 #1}{d {#2}^2}}
+% Limit to N / N
+\newcommand{\limover}[1]{\lim_{#1 \rightarrow \infty} \dfrac{1}{#1}}
+% Display style sum
+\newcommand{\dsum}{\displaystyle\sum}
+% arg min and arg max
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg~max}}}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg~min}}}
+%---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent Begin abstract
+\end{abstract}
+
+
+
+\section{Introduction}
+\section{Partial Differential Equation}
+\subsection{Fourier series}
+\begin{equation}f(x)=\frac{a_{0}}{2}+\sum_{n=1}^{\infty}\left(a_{n} \cos \frac{n \pi x}{L}+b_{n} \sin \frac{n \pi x}{L}\right)\end{equation}
+According to the orthogonality relations for sine and cosine. \par 
+\begin{equation}\begin{array}{c}
+\int_{-L}^{L} \cos \left(\frac{m \pi x}{L}\right) \cos \left(\frac{n \pi x}{L}\right) d x=L \delta_{n m} \\
+\int_{-L}^{L} \sin \left(\frac{m \pi x}{L}\right) \sin \left(\frac{n \pi x}{L}\right) d x=L \delta_{n m} \\
+\int_{-L}^{L} \cos \left(\frac{m \pi x}{L}\right) \sin \left(\frac{n \pi x}{L}\right) d x=0
+\end{array}\end{equation}\par
+\textcolor{blue}{***Note: detailed notes in Integral Notes$->$Step 1}\par
+\bigbreak 
+We multiply f(x) by $\sin \frac{n\pi x}{L}$ and take integral with respect to x.\par 
+
+\begin{equation}\begin{aligned}
+\int_{-L}^{L} f(x) \sin \frac{n \pi x}{L} d x &=\sum_{m=1}^{\infty} b_{m} \int_{-L}^{L} \sin \frac{n \pi x}{L} \sin \frac{m \pi x}{L} d x \\
+&=\sum_{m=1}^{\infty} b_{m}\left(L \delta_{n m}\right) \\
+&=L b_{n}
+\end{aligned}\end{equation}
+Then multiply f(x) by $\cos \frac{n\pi x}{L}$ and take integral with respect to x.\par 
+\begin{equation}a_{n}=\frac{1}{L} \int_{-L}^{L} f(x) \cos \frac{n \pi x}{L} d x, \quad b_{n}=\frac{1}{L} \int_{-L}^{L} f(x) \sin \frac{n \pi x}{L} d x\end{equation}
+\subsection{Fourier sine and cosine series}
+We now know that the Fourier series of a periodic function with period $2 L$ is given by
+$$
+f(x)=\frac{a_{0}}{2}+\sum_{n=1}^{\infty}\left(a_{n} \cos \frac{n \pi x}{L}+b_{n} \sin \frac{n \pi x}{L}\right)
+$$
+with
+$$
+a_{n}=\frac{1}{L} \int_{-L}^{L} f(x) \cos \frac{n \pi x}{L} d x, \quad b_{n}=\frac{1}{L} \int_{-L}^{L} f(x) \sin \frac{n \pi x}{L} d x
+$$
+In this section, we provide a simplified version of fourier series if $f(x)$ is odd or even.\par 
+\bigbreak 
+If $f(x)$ is an even function,\par 
+\begin{equation}a_{n}=\frac{2}{L} \int_{0}^{L} f(x) \cos \frac{n \pi x}{L} d x, \quad b_{n}=0\end{equation}
+\begin{equation}f(x)=\frac{a_{0}}{2}+\sum_{n=1}^{\infty} a_{n} \cos \frac{n \pi x}{L}, \quad f(x) \text { even }\end{equation}\par 
+\bigbreak
+If $f(x)$ is an odd function,\par 
+\begin{equation}a_{n}=0, \quad b_{n}=\frac{2}{L} \int_{0}^{L} f(x) \sin \frac{n \pi x}{L} d x\end{equation}
+\begin{equation}f(x)=\sum_{n=1}^{\infty} b_{n} \sin \frac{n \pi x}{L}, \quad f(x) \text { odd }\end{equation}
+\subsection{Example of Fourier series}
+\begin{equation}f(x)=1-\frac{2 x}{\pi}, \quad 0<x<\pi\end{equation}
+Fourier expression,\par
+\begin{equation}f(x)=\frac{8}{\pi^{2}}\left(\cos x+\frac{\cos 3 x}{3^{2}}+\frac{\cos 5 x}{5^{2}}+\ldots\right)\end{equation}
+\bigbreak
+\noindent Since\par 
+\begin{equation}f(x)=\frac{a_{0}}{2}+\sum_{n=1}^{\infty} a_{n} \cos n x, \text { with } a_{n}=\frac{2}{\pi} \int_{0}^{\pi} f(x) \cos n x d x\end{equation}
+\begin{equation}a_{n}=\frac{2}{\pi} \int_{0}^{\pi}\left(1-\frac{2 x}{\pi}\right) \cos n x d x=\frac{4}{n^{2} \pi^{2}}(1-\cos n \pi)=\left\{\begin{array}{ll}
+8 /\left(n^{2} \pi^{2}\right), & \text { if } n \text { odd } \\
+0, & \text { if } n \text { even }
+\end{array}\right.\end{equation}
+\subsection{Diffusion equation (separation of variables)}
+\begin{equation}\begin{array}{c}
+u_{t}=D u_{x x}\\
+u_{0,t} = 0\\
+u_{L,t} = 0\\
+u(x, 0)=f(x)
+\end{array}\end{equation}
+where,
+\begin{equation}
+D \text{  is a constant },\quad D>0.
+\end{equation}\par
+We assume,\par 
+\begin{equation}u(x, t)=X(x) T(t)\end{equation}
+and substitute the ansatz into the diffusion equation\par
+\begin{equation}\begin{array}{c}X T^{\prime}=D X^{\prime \prime} T\\
+\quad\\
+\dfrac{X^{\prime \prime}}{X}=\dfrac{1}{D} \dfrac{T^{\prime}}{T}
+
+\end{array}\end{equation} 
+The left-hand side is independent to t and the right-hand side is independent to x. So, they need to be equal to a constant. Let's say $\lambda$.\par
+\begin{equation}X^{\prime \prime}+\lambda X=0, \quad T^{\prime}+\lambda D T=0\end{equation}\par 
+\noindent Then it is easy to solve these two ODEs with the boundary conditions\par 
+\begin{equation}u(0, t)=X(0) T(t)=0, \quad u(L, t)=X(L) T(t)=0\end{equation}\par 
+Solution. 1\par 
+
+\begin{equation}
+\begin{array}{c}
+X^{\prime \prime}+\lambda X=0, \quad X(0)=X(L)=0\\
+\quad \\
+c^{2} + \lambda  = 0, \quad \lambda = \mu^{2}\\
+c = \pm \mu i \\
+
+
+X(x)=A \cos \mu x+B \sin \mu x\\
+\quad \\
+A = 0\quad (X(0) = 0),\quad B\sin \mu L = 0\quad (X(L) = 0)\\
+\quad \\
+\sin \mu L = 0\Rightarrow \mu_{n} = \dfrac{n\pi}{L}\\
+\quad \\
+X_{n}=\sin (n \pi x / L),\quad n = 1,2,3,...
+\end{array}
+\end{equation}\par 
+Solution. 2\par 
+\begin{equation}\begin{array}{c}
+T^{\prime}+\left(n^{2} \pi^{2} D / L^{2}\right) T=0 \\
+\quad \\
+T_{n}=e^{-n^{2} \pi^{2} D t / L^{2}}
+\end{array}\end{equation}\par 
+In the end,\par 
+\begin{equation}u_{n}(x, t)=\sin (n \pi x / L) e^{-n^{2} \pi^{2} D t / L^{2}}\end{equation}\par 
+By superposition for homogeneous linear differential equations the states that the general solution with the spatial boundary conditions is given by\par 
+\begin{equation}u(x, t)=\sum_{n=1}^{\infty} b_{n} u_{n}(x, t)=\sum_{n=1}^{\infty} b_{n} \sin (n \pi x / L) e^{-n^{2} \pi^{2} D t / L^{2}}\end{equation}
+Then we can apply the last condition and if\par 
+
+\begin{equation}f(x)=\sum_{n=1}^{\infty} b_{n} \sin (n \pi x / L)\end{equation}
+
+\begin{equation}b_{n}=\frac{2}{L} \int_{0}^{L} f(x) \sin \frac{n \pi x}{L} d x\end{equation}
+\subsection{Summary: Diffusion equation}
+Given a diffusion equation,\par 
+\begin{equation}\begin{array}{c}
+u_{t}=D u_{x x}\\
+u_{0,t} = 0\\
+u_{L,t} = 0\\
+u(x, 0)=f(x)
+\end{array}\end{equation}\par 
+where,
+\begin{equation}
+D \text{  is a constant },\quad D>0.
+\end{equation}\par
+\bigbreak
+\bigbreak
+\noindent \textsl{Solution.}\par 
+
+\begin{equation}\begin{array}{c}
+f(x)=\sum_{n=1}^{\infty} b_{n} \sin (n \pi x / L)\\
+\quad\\
+b_{n}=\frac{2}{L} \int_{0}^{L} f(x) \sin \frac{n \pi x}{L} d x
+\end{array}\end{equation}
+\end{document}

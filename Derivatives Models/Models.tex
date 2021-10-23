@@ -1,0 +1,730 @@
+\documentclass[a4]{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{xcolor}
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{figures/}}
+\usepackage{graphicx}
+\title{Stochastic Calculus Notes}
+\author{Cliff}
+
+% Make prettier tables.
+\usepackage{booktabs}
+
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{units}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+
+
+%%% Custom Commands
+%---------------------------------------------------------------------------
+% Concise referencing
+\newcommand{\eqnref}[1]{\eqref{#1}}
+\newcommand{\secref}[1]{Section \ref{#1}}
+\newcommand{\figref}[1]{Figure \ref{#1}}
+\newcommand{\lemref}[1]{Lemma \ref{#1}}
+\newcommand{\corref}[1]{Corollary \ref{#1}}
+\newcommand{\thmref}[1]{Theorem \ref{#1}}
+% Real numbers
+\newcommand{\Real}[1]{\mathbb{R}^{#1}}
+% Complex numbers
+\newcommand{\Complex}[1]{\mathbb{C}^{#1}}
+% Integers
+\newcommand{\Integer}[1]{\mathbb{Z}^{#1}}
+% Rank operator
+\DeclareMathOperator{\rank}{\textnormal{rank}}
+% Vec operator
+\newcommand{\vecop}{\textnormal{vec}}
+% Norm
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+% Trace
+\newcommand{\trace}{\textnormal{tr}}
+% Range
+\newcommand{\range}{\textnormal{range}}
+% Partial derivative
+\newcommand{\pd}[2]{\dfrac{\partial #1}{\partial #2}}
+% Complete derivative
+\newcommand{\dd}[2]{\dfrac{d #1}{d #2}}
+% Complete derivative, second order
+\newcommand{\dds}[2]{\dfrac{d^2 #1}{d {#2}^2}}
+% Limit to N / N
+\newcommand{\limover}[1]{\lim_{#1 \rightarrow \infty} \dfrac{1}{#1}}
+% Display style sum
+\newcommand{\dsum}{\displaystyle\sum}
+% arg min and arg max
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg~max}}}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg~min}}}
+%---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{example}
+\newtheorem{corollary}{Corollary}
+\begin{document}
+\tableofcontents
+\newpage
+\maketitle
+\section{Option Basics}
+The bound for a European Option.\par 
+$$
+S \geq c(S,K) \geq \max (S-K P(0, T), 0)
+$$
+\par 
+Proof
+The upper bound is simple, since$S>C_{\infty}(S,K)>c_{\infty}(S,K)>c(S,K)$. The lower bound is because $c(S,X) + KP(t,T) >S$ and option value is non-negative.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{screenshot002}
+	\caption{Option Price Bound}
+	\label{fig:screenshot002}
+\end{figure}
+$X=K$ and $B(\tau ) = P(0,T)$
+\subsection{Convexity Properties}
+Write $X_{2}=$ $\lambda X_{3}+(1-\lambda) X_{1},$ where $0 \leq \lambda \leq 1, X_{1} \leq X_{2} \leq X_{3},$ the convexity\par 
+$$
+c\left(S, \tau ; X_{2}\right) \leq \lambda c\left(S, \tau ; X_{3}\right)+(1-\lambda) c\left(S, \tau ; X_{1}\right)
+$$
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{screenshot003}
+	\caption{Convexity}
+	\label{fig:screenshot003}
+\end{figure}
+$c(S, \tau ; X)$ is a decreasing function of $X ;$ furthermore, $\left|\frac{\partial c}{\partial X}\right|<B(\tau)$
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{screenshot004}
+	\caption{American Options}
+	\label{fig:screenshot004}
+\end{figure}
+
+\section{Black-Sholes Model}
+Define the underlying $S(t)$ as
+$$
+\begin{aligned}
+\frac{dS(t)}{S(t)} &= \mu_{s}(t)dt + \sigma_{s}(t)dW(t)
+\end{aligned}
+$$
+Define the discount factor $D(t)$ as\par 
+$$
+\frac{dD(t)}{D(t)} = -R(t)dt
+$$\par 
+$$
+\begin{aligned}
+\frac{d(D(t)S(t))}{D(t)S(t)} &= \frac{dD(t)}{dD(t)} +  \frac{dS(t)}{dS(t)} + ( \frac{dD(t)}{dD(t)})( \frac{dS(t)}{dS(t)})\\
+& = (\mu_{s}(t)-R(t))dt + \sigma_{s}(t)dW(t)\\
+&= \sigma_{s}(t)[\sigma_{s}(t)^{-1}(\mu_{s}(t) - R(t))dt + dW(t)]\\
+&= \sigma_{s}(t)[\Theta (t)dt + dW(t)]\\
+&=\sigma_{s}(t)d\tilde{W}(t)
+\end{aligned}
+$$
+The last equality is held because Girsanov's Theorem. 
+\begin{theorem}[Radon-Nikodym derivatives]
+	Consider a random variable $X$ under two different probability measures $\mathcal{P}$ and  $\tilde{\mathcal{P}}$, we define symbolically\par 
+	$$
+	\begin{array}{l}
+	\mathrm{d} P_{X}(x)=P\left[X \in\left(x-\frac{\mathrm{d} x}{2}, x+\frac{\mathrm{d} x}{2}\right)\right]=f_{X}^{P}(x) \mathrm{d} x \\
+	\mathrm{~d} \widetilde{P}_{X}(x)=\widetilde{P}\left[X \in\left(x-\frac{\mathrm{d} x}{2}, x+\frac{\mathrm{d} x}{2}\right)\right]=f_{X}^{\widetilde{P}}(x) \mathrm{d} x
+	\end{array}
+	$$\par 
+	\bigbreak
+	
+	\noindent The expectation calculations of X under  $\mathcal{P}$ and 	$\tilde{\mathcal{P}}$ are related by \par 
+	$$
+	\begin{aligned}
+	E_{\widetilde{P}}[X] &=\int x \mathrm{~d} \widetilde{P}_{X}(x)=\int x f_{X}^{\widetilde{P}}(x) \mathrm{d} x=\int x\left[\frac{f_{X}^{\widetilde{P}}(x)}{f_{X}^{P}(x)}\right] f_{X}^{P}(x) \mathrm{d} x \\
+	&=\int x\left[\frac{f_{X}^{\widetilde{P}}(x)}{f_{X}^{P}(x)}\right] \mathrm{d} P_{X}(x)=E_{P}\left[X \frac{\mathrm{d} \tilde{P}}{\mathrm{~d} P}\right]
+	\end{aligned}
+	$$\par 
+	where $$
+	f_{X}^{\widetilde{P}}(x) / f_{X}^{P}(x)=\frac{\mathrm{d} \widetilde{P}_{X}(x)}{\mathrm{d} P_{X}(x)}
+	$$ is the likelihood ratio of the density functions of X under $\mathcal{P}$ and $\tilde{\mathcal{P}}$. It is coined as the Radon-Nikodym derivative.
+\end{theorem}
+\begin{theorem}[Girsanov, One dimension]
+	In a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, let $W(t)$ be a Brownian Motion and $\Theta(t)$ be an adapted process with filtration $\mathcal{F}_{t}$. Define $\tilde{\mathbb{P}}_{A}=\int_{A}Zd\mathbb{P}$, $$
+	Z(t) = \exp\{\int^{t}_{0}\Theta(u)dW(u)-\frac{1}{2}\int_{t}^{\infty}\Theta^{2}(u)du\}
+	$$
+	with $\mathbb{E}(\int_{t}^{\infty}\Theta^{2}(u)du)<\infty$ Then $$
+	\int d\tilde{W}(t) = \int (\Theta(t)dt + dW(t))
+	$$is a Brownian Motion under measure $\tilde{\mathbb{P}}$.
+\end{theorem}
+Define the capital amount as $X(t)$\par 
+$$
+\begin{aligned}
+dX(t) &= \Delta(t)dS(t) + R(t)(X(t) - \Delta(t)S(t))dt\\
+&=R(t)X(t)dt+\Delta(t)(\mu_{s}(t)-R(t))S(t)dt +\Delta(t)\sigma_{s}(t)S(t)dW(t)\\
+&=R(t)X(t)dt+\Delta(t)\sigma_{s}(t)[\Theta(t)dt +dW(t)]S(t)
+\end{aligned}
+$$\par 
+and\par 
+$$
+\begin{aligned}
+d(D(t)X(t)) =\Delta(t)\sigma_{s}(t)S(t)[\Theta(t)dt +dW(t)]
+\end{aligned}
+$$
+Change to measure $\tilde{P}$ using Girsanov Theorem\par 
+$$
+d(D(t)X(t)) =\sigma_{s}(t)\Delta(t)S(t)d\tilde{W}(t)
+$$
+Then using $V(t)$ denotes the payoff of derivatives, with the condition $X(0) = V(0)$ and $X(T) = V(T)$
+$$
+D(t)X(t) = \tilde{\mathbb{E}}[D(T)X(T)|\mathcal{F}_{t}]=\tilde{\mathbb{E}}[D(T)V(T)|\mathcal{F}_{t}]
+$$
+$$
+D(t)V(t) =\tilde{\mathbb{E}}[D(T)V(T)|\mathcal{F}_{t}]
+$$
+In conclusion, \par 
+$$
+V(t) =\tilde{\mathbb{E}}[D(t)^{-1}D(t)V(T)|\mathcal{F}_{t}]=\tilde{\mathbb{E}}[e^{\int_{t}^{T}-R(t)dt}V(T)|\mathcal{F}_{t}]
+$$
+and the last equation is also called \textsl{risk-neutral pricing formula} in continuous-time model.Note that the above formula is the induction of Fundamental Asset Pricing Formula using $B(t) = e^{\int^{t}_{0}R(t)dt}$ as the numeraire.
+$$
+V(t) = B(t)\mathbb{E}^{B}\left[\frac{V(T)}{B(T)}\right]
+$$
+\par And we compute the value of derivatives with payoff $(S(T)-K)^{+}$, $c(x,t)$ where $x=S(t)$.
+$$
+c(x,t) = c(S(t),t) = \tilde{\mathbb{E}}[e^{\int_{t}^{T}-R(t)dt}(S(T)-K)^{+}|\mathcal{F}_{t}]
+$$
+Let $R(t)=r$, $\sigma_{s}(t)=\sigma_{s}$
+$$
+\begin{aligned}
+c(x,t) = c(S(t),t) &= \tilde{\mathbb{E}}[e^{-r(T-t)}(S(T)-K)^{+}|\mathcal{F}_{t}]\\&= e^{-r(T-t)}\tilde{\mathbb{E}}[(S(T)-K)^{+}|\mathcal{F}_{t}]\\ 
+&= e^{-r(T-t)}\tilde{\mathbb{E}}[(S(t)\exp\{\sigma (\tilde{W}(T)-\tilde{W}(t)) + (r-\frac{1}{2}\sigma^{2})(T-t)\}-K)^{+}|\mathcal{F}_{t}]\\ 
+\end{aligned}
+$$
+Then we have $Y(\tau)=\tilde{W}(T)-\tilde{W}(t)$ as a normal random variable.
+$$
+\begin{aligned}
+c(x,t)
+&= e^{-r(T-t)}\tilde{\mathbb{E}}[(S(t)\exp\{\sigma Y(\tau) + (r-\frac{1}{2}\sigma^{2})\tau\}-K)^{+}|\mathcal{F}_{t}]\\ 
+&=e^{-r\tau}\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{d\_(x,t)}(S(t)\exp\{-\sigma \sqrt{\tau}y + (r-\frac{1}{2}\sigma^{2})\tau\}-K)e^{-\frac{y^{2}}{2}}\quad dy\\
+&=e^{-r\tau}\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{d\_(x,t)}S(t)e^{\{-\sigma \sqrt{\tau}y + (r-\frac{1}{2}\sigma^{2})\tau\}}e^{-\frac{y^{2}}{2}}\quad dy\\
+&-e^{-r\tau}\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{d\_(x,t)}Ke^{-\frac{y^{2}}{2}}\quad dy\\
+&=e^{-r\tau}\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{d\_(x,t)}S(t)e^{\{-\sigma \sqrt{\tau}y + (r-\frac{1}{2}\sigma^{2})\tau\}}e^{-\frac{y^{2}}{2}}\quad dy -e^{-r\tau}KN(d\_(x,t))\\
+&=\int_{-\infty}^{d\_(x,t)}S(t)e^{-\frac{1}{2}(\sigma\sqrt{\tau}-y)^{2}}\quad dy -e^{-r\tau}KN(d\_(x,t))\\
+&=S(t)N(d_{+}(x,t))-e^{-r\tau}KN(d\_(x,t))\\
+\end{aligned}
+$$
+where $d_{+}(x,t) = \frac{1}{\sigma \sqrt{\tau}}[\log \frac{x}{K}+(r+\frac{1}{2}\sigma_{s}^{2})\tau]$ and  $d_{-}(x,t) = \frac{1}{\sigma \sqrt{\tau}}[\log \frac{x}{K}+(r-\frac{1}{2}\sigma_{s}^{2})\tau]$.\par 
+\bigbreak
+In conclusion, $BSM(S(t),K,\tau,r,\sigma_{s}) = S(t)N(d_{+}(S(t),t))-e^{-r\tau}KN(d\_(S(t),t))$
+\bigbreak 
+\noindent \textbf{Note*:} Risk Neutral Pricing\par 
+For any non-dividend-paying assets X(t), $$
+\dfrac{dX(t)}{X(t)} = \alpha(t)dt + \sigma(t)dW(t)
+$$\par In risk neutral measure, $d\tilde{W}(t) = \Theta(t)dt + dW(t)$, and $\dfrac{dX(t)}{X(t)}=(\alpha(t) - \sigma(t)\Theta(t))dt + \sigma(t)d\tilde{W}(t)$, where $\Theta(t) = \dfrac{\alpha(t)-R(t)}{\sigma(t)}$. Substitute into the equation $\dfrac{dX(t)}{X(t)}=R(t)dt + \sigma(t)d\tilde{W}(t)$.
+\subsection{Currency Options}
+Its payoff is $(X(T)-K)^{+}$, using $BSM(x,K,\tau,r, q,\sigma_{s})$, we have
+$$
+BSM(X(t),K,\tau,r, r_{f},\sigma_{x})
+$$
+\subsection{Options on Foreign Assets Struck in Foreign Currency}
+Its payoff is $(X(T)S(T)-K)^{+}$, using $BSM(x,K,\tau,r,q,\sigma_{s})$, we have
+$$
+BSM(X(T)S(T),K,\tau,r, q,\sigma_{X(t)S(t)})\text{ with $\sigma_{X(t)S(t)}=\sqrt{\sigma_{x}^{2} + \sigma_{s}^{2}+2\rho\sigma_{x}\sigma_{s}}$}
+$$
+Since
+$$
+\begin{aligned}
+\sigma_{X(t)S(t)}^{2}dt&=(\frac{d(X(t)S(t))}{X(t)S(t)})(\frac{d(X(t)S(t))}{X(t)S(t)})\\
+&=(\frac{dX(t)}{X(t)}+\frac{dS(t)}{S(t)}+\frac{dX(t)}{X(t)}\frac{dS(t)}{S(t)})(\frac{dX(t)}{X(t)}+\frac{dS(t)}{S(t)}+\frac{dX(t)}{X(t)}\frac{dS(t)}{S(t)})\\
+&=\{(\mu_{x}+\mu_{s}+\rho_{x,s}\sigma_{x}\sigma_{s})dt + \sigma_{x}dW_{x}(t)+\sigma_{s}dW_{s}(t)\}\\
+&\{(\mu_{x}+\mu_{s}+\rho_{x,s}\sigma_{x}\sigma_{s})dt + \sigma_{x}dW_{x}(t)+\sigma_{s}dW_{s}(t)\}\\
+&=\left[\sigma_{x}dW_{x}(t)+\sigma_{s}dW_{s}(t)\right]\left[\sigma_{x}dW_{x}(t)+\sigma_{s}dW_{s}(t)\right]\\
+&=(\sigma_{x}^{2} + \sigma_{s}^{2}+2\rho_{x,s}\sigma_{x}\sigma_{s})dt
+\end{aligned}
+$$
+\subsection{Quantos}
+Before compute the price of the quantos, we introduce a risky numeriare $Y(t)$.
+$$
+\begin{aligned}
+\text{Let }Q(t) = \frac{V(t)}{Y(t)},& \text{ where $V(t)$ is the underlying portfolio}\\
+&V(t) = e^{\int_{-\infty}^{t}q du}S(t)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\frac{dQ(t)}{Q(t)}&=\frac{dV(t)}{V(t)}-\frac{dY(t)}{Y(t)}-(\frac{dV(t)}{V(t)})(\frac{dY(t)}{Y(t)})+(\frac{dY(t)}{Y(t)})^{2}\\
+&=(q-\rho \sigma_{s}\sigma_{y}+\sigma_{y}^{2})dt + \frac{dS}{S} - \frac{dY}{Y}
+\end{aligned}
+$$
+and consider $dY/Y$ when $Y$ as numeraire\par 
+$$
+\begin{aligned}
+\frac{d(R/Y)}{R/Y} = (r+\sigma_{y}^{2})dt  - \frac{dY}{Y}
+\end{aligned}$$
+that
+$$
+\frac{dY}{Y}= (r+\sigma_{y}^{2})dt + \sigma_{y}dW^{*}
+$$
+substitute the above equation into $dQ/Q$, we have\par 
+$$
+\begin{aligned}
+\frac{dQ(t)}{Q(t)}&=(q-\rho \sigma_{s}\sigma_{y}+\sigma_{y}^{2})dt + \frac{dS}{S} - (r+\sigma_{y}^{2})dt - \sigma_{y}dW^{*}\\
+&=(q-r-\rho \sigma_{s}\sigma_{y})dt + \frac{dS}{S}-\sigma_{y}dW^{*}
+\end{aligned}
+$$
+$$
+\frac{dS}{S}=(r-q+\rho \sigma_{s}\sigma_{y})dt +\sigma_{s}dW^{*}
+$$
+Its payoff is $\bar{X}S(T)$ and we select $Z(t)=X(t)e^{qt}S(t)$ as numeraire.\par 
+Through Fundamental Pricing Formula, $\bar{X}S(0)=Z(0)\mathbb{E}^{Z}\left[\frac{\bar{X}S(T)}{Z(T)}\right]$ with $Z(t)=X(t)e^{qt}S(t)$.
+$$
+\begin{aligned}
+Z(0)\mathbb{E}^{Z}\left[\frac{\bar{X}S(T)}{Z(T)}\right]&=X(0)S(0)e^{-qT}\mathbb{E}^{Z}\left[\frac{\bar{X}S(T)}{X(T)S(T)}\right]\\
+&=\bar{X}S(0)e^{-qT}\mathbb{E}^{Z}\left[\frac{X(0)}{X(T)}\right]\\
+\end{aligned}
+$$  
+Now, we compute $dX/X$ under numeraire $Z$ through the above formula,\par 
+(i) Compute the correlation between $X$ and $Z$.
+$$
+\begin{aligned}
+\frac{dZ}{Z} &= qdt + \frac{d(XS)}{XS}\\
+&=qdt + \frac{dX}{X} + \frac{dS}{S}+\frac{dX}{X}\frac{dS}{S}\\
+&=(q + \mu_{s}+\mu_{x}+\rho_{x,s}\sigma_{x}\sigma_{s})dt + \sigma_{x}dW_{x}+\sigma_{s}dW_{s}\\
+&=(q + \mu_{s}+\mu_{x}+\rho_{x,s}\sigma_{x}\sigma_{s})dt + \sigma (\frac{\sigma_{x}}{\sigma}dW_{x}+\frac{\sigma_{s}}{\sigma}dW_{s})
+\end{aligned}
+$$
+$$
+dW = (\frac{\sigma_{x}}{\sigma}dW_{x}+\frac{\sigma_{s}}{\sigma}dW_{s})
+$$
+The correlation is $\rho dt=(dW)(dW_{x})=\frac{\sigma_{x}+\rho_{x,s}\sigma_{s}}{\sigma}dt$.\par\bigbreak
+\noindent We substitute $r=r,q=r_{f},\rho=\frac{\sigma_{x}+\rho_{x,s}\sigma_{s}}{\sigma}\text{ and } \sigma_{s}=\sigma_{x}$,\par 
+$$
+\frac{dX}{X}=(r-r_{f}+\sigma_{x}^{2}+\rho_{x,s}\sigma_{x}\sigma_{s})dt + \sigma_{x}dW_{x}^{*}
+$$\par 
+and $$
+\frac{d(1/X)}{1/X}=-\frac{dX}{X} + (\frac{dX}{X})^{2}=(r_{f}-r + \rho_{x,s}\sigma_{x}\sigma_{s})dt-\sigma_{x}dW_{x}^{*}
+$$\par 
+is equivalent as 
+$$
+\frac{d(1/X)}{1/X}=-\frac{dX}{X} + (\frac{dX}{X})^{2}=(r_{f}-r + \rho_{x,s}\sigma_{x}\sigma_{s})dt+\sigma_{x}dW_{x}^{*}
+$$\par
+under numeraire $Z(t)$.
+$$
+\frac{1}{X(T)}=\exp\{\int_{-\infty}^{T}(r_{f}-r + \rho_{x,s}\sigma_{x}\sigma_{s}-\frac{1}{2}\sigma_{x}^{2})dt+\int_{-\infty}^{T}\sigma_{x}dW_{x}^{*}\}
+$$
+$$
+\begin{aligned}
+\mathbb{E}\left[\frac{X(0)}{X(T)}\right]&=\mathbb{E}\left[\exp\{\int_{-\infty}^{T}(r_{f}-r + \rho_{x,s}\sigma_{x}\sigma_{s}-\frac{1}{2}\sigma_{x}^{2})dt+\int_{-\infty}^{T}\sigma_{x}dW_{x}^{*}\}\right]\\
+&=\exp\{(r_{f}-r + \rho_{x,s}\sigma_{x}\sigma_{s})T\}
+\end{aligned}
+$$
+The quanto price at $t=0$ is $\bar{X}S(0)\exp\{(r_{f}-r-q + \rho_{x,s}\sigma_{x}\sigma_{s})T\}$.
+\subsection{Quanto Forwards}
+Let the forward price $F^{*}(t)$, and its payoff is $\bar{X}S(T)-F^{*}(t)$. The quanto forward price $F^{*}(t)$ is\par 
+$$
+F^{*}(t)=e^{r(T-t)}V(t)=\exp\{(r_{f}-q-\rho\sigma_{x}\sigma_{s})(T-t)\}\bar{X}S(t)
+$$
+\subsection{Quanto Options}
+Let $V(T)=\bar{X}S(T)$ and $\sigma_{\bar{X}S(T)}=\sigma_{s}$. The value of a quanto call is 
+$$
+\begin{aligned}
+V(0)&N(d_{1}) - e^{-rT}KN(d_{2})\\
+&=\bar{X}S(0)\exp\{(r_{f}-r-q + \rho_{x,s}\sigma_{x}\sigma_{s})T\}N(d_{1})-e^{-rT}KN(d_{2})
+\end{aligned}
+$$
+where
+$$
+d_{1}=\frac{\log \left(\frac{V(0)}{K}\right)+(r+\frac{1}{2}\sigma_{s}^{2})T}{\sigma\sqrt{T}}
+$$
+
+$$
+d_{2}=d_{1}-\sigma_{s}\sqrt{T}
+$$
+Likewise, the value of a quanto put is given by the BS formula,\par 
+$$
+e^{-rT}KN(-d_{2})-V(0)N(-d_{1})
+$$
+\subsection{Return Swaps}
+The fair swap spread, which equates the value at date 0 of receiving the cash flow\par 
+$$
+CF(T) = \left(a + \frac{S_{f}(T)}{S_{f}(0)} - \frac{S_{d}(T)}{S_{d}(0)}\right)
+$$
+at date T to zero, is\par 
+$$
+a = \exp\{(r-q_{d})T\} - \exp\{(r_{f}-q_{f}-\rho \sigma_{x}\sigma_{s})\}
+$$
+\textsl{Sketch of Proof}: Since the value of receiving $\frac{S_{d}(0)}{S_{d}(0)}$ at date 0 is $\dfrac{e^{-qTS(0)}}{S(0)}=e^{-q_{d}T}$. And if we think $\frac{1}{S(0)}$ is a fixed exchange rate $\bar{X}$ in quanto, we can substitute the exchange rate volatility $\sigma_{x}$, foreign underlying volatility $\sigma_{s}$ and their correlation $\rho$ into quanto price formula at date 0.\par 
+$$
+\bar{X}S(0)\exp\{(r_{f}-r-q + \rho\sigma_{x}\sigma_{s})T\}
+$$
+In conclusion,\par 
+$$
+\mathbb{E}_{0}\left[CF(T)\right] = e^{-rT}a - e^{-q_{d}T} + \bar{X}S(0)\exp\{(r_{f}-r-q + \rho\sigma_{x}\sigma_{s})T\}=0
+$$
+That \par
+$$
+a = \exp\{(r-q_{d})T\} - \exp\{(r_{f}-q_{f}-\rho\sigma_{x}\sigma_{s})\}
+$$
+\subsection{Uncovered Interest Parity in the Risk-Neutral Probabilities}
+If we regard the foreign exchange rate, X, as an asset with dividends rate $r_{f}$, referring underlying dynamics under the risk-neutral measure, we have\par 
+$$
+\dfrac{dX}{X}=(r-r_{f})dt + \sigma_{x}dB_{x}^{*}
+$$
+It shows the no-risk return of different foreign currencies will converge. That we cannot earn profit by cross-currency arbitrage theoretically.
+\section{Black-Sholes Extension}
+\subsection{Margrabe's Formula}
+Consider a payoff $\max(S_{1}(T)-S_{2}(T), 0)$, its price can be evaluated by BSM through thinking  $\max(S_{1}(T)-S_{2}(T), 0) = \max(\dfrac{S_{1}(T)}{S_{2}(T)}-1, 0)$ and $S_{2}(t)$ is a FX rate.\par 
+Assume $\dfrac{dS_{i}}{S_{i}}=\mu_{i}dt + \sigma_{i}dW(t)$, we have
+$$
+e^{-q_{1}T}S_{1}(0)N(d_{+})- e^{-q_{2}T}S_{2}(0)N(d_{-})
+$$
+where $d_{+} = \dfrac{\ln(S_{1}/S_{2}(0)) + (q_{2}-q_{1} + \frac{1}{2}\sigma^{2})T}{\sigma\sqrt{T} }$ and $\sigma = \sqrt{\sigma^{2}_{1}-2\rho \sigma_{1}\sigma_{2} + \sigma_{2}^{2}}$
+\subsection{Black's Formula}
+Black's Model is used to price the option on forward contracts, and futures contracts with deterministic interest rates. \par 
+\bigbreak
+Consider a forward contract mature at T', $T'>T$, its call option has payoff $\max(F(T)-K, 0)$ at T.\par 
+\bigbreak 
+Assume $\dfrac{dF}{F}=\mu dt + \sigma dW(t)$ and interest rate is random which can be written as $P(t, T) = e^{\int_{t}^{T}-R(u)du}$. Its payoff at T is $\max(P(T, T')F(T)-P(T, T')K, 0)$. Recall Margrabe's Formula, let $S_{1}(T) = P(T, T')F(T)$ and $S_{2}(T)=P(T, T')K$\par 
+$$
+P(0, T')F(0)N(d_{+})- P(0, T')KN(d_{-})
+$$
+where $d_{+} = \dfrac{\ln(F(0)/K) + \frac{1}{2}\sigma^{2})T}{\sigma\sqrt{T} }$ and $\sigma$ is the volatility of $\dfrac{F}{K}$.\par 
+\bigbreak
+\bigbreak 
+Put-Call Parity: $C + P(0. T')K = P + P(0, T')F(0)$.
+\subsection{Merton's Formula}
+The Merton's Formula is similar to the Black-Sholes Formula, consider a payoff $\max(F(T)-K, 0)$ and assume the interest rate is random,\par 
+$$
+\dfrac{dF}{F}=\mu dt + \sigma dW(t)
+$$
+$$
+\begin{aligned}
+\text{Call Price}&=e^{-qT}S(0)N(d_{+}) - P(0, T)KN(d_{-})\\
+\text{Put Price}&= P(0, T)KN(-d_{-}) - e^{-qT}S(0)N(-d_{+})\\
+\end{aligned}
+$$
+where $d_{+}=\dfrac{\log\left(\dfrac{S(0)}{KP(0,T)}\right)-qT + \frac{1}{2}\sigma^{2}T}{\sigma\sqrt{T}}$. \par 
+Attention: The $\sigma$ is forward volatility and we can estimate the forward volatility through underlying volatility and interest rate volatility.
+$$
+\begin{aligned}
+\dfrac{dS}{S}&=\mu_{s}dt + \sigma_{s}dB_{s},\\
+\dfrac{dP}{P}&=\mu_{p}dt + \sigma_{p}dB_{p},
+F(t)&=e^{-q(T-t)}S(t)/P(t, T)
+\end{aligned}
+$$
+The forward volatility is $\sigma= \sqrt{\sigma_{s}^{2} + \sigma_{p}^{2}-2\rho\sigma_{s}\sigma_{p}}$.
+\subsection{Deferred Exchange Options}
+Consider an option maturity at T and will exchange two assets at T' $>$ T. So , its payoff is $\max (P(0, T')F_{1}(0)-P(0, T')F_{2}(0),0)$. Using Margrabe's formula, and let 
+$$
+S_{1}^{*}(t) = P(t, T')F_{1}(t)
+$$
+$$
+S_{2}^{*}(t) = P(t, T')F_{2}(t)
+$$\par 
+The option price is $S_{1}(0)e^{-q_{1}T'}N(d_{+})-S_{2}(0)e^{-q_{2}T'}N(d_{-})$, where $d_{+} = \dfrac{\log(\dfrac{S_{1}(0)}{S_{2}(0)}) + (q_{2}-q_{1})T' + \frac{1}{2}\sigma^{2}T}{\sigma \sqrt{T}}$. \par 
+\noindent Note: the forward price is $F(t) = \dfrac{e^{-qT}S(t)}{P(t, T)}$.
+\subsection{Generic Option}
+$$
+PV_{1}N(d_{+}) - PV_{2}N(d_{-}), \quad d_{+} = \dfrac{\log \dfrac{PV_{1}}{PV_{2}}+\frac{1}{2}\sigma^{2}T }{\sigma\sqrt{T}}
+$$
+
+\subsection{Dynamic Hedging Strategy of Futures}
+Consider the futures matured at $t_{N}$ has price $G(t_{i}, t_{N})_{i=1,2,3...,n}$, if we want long 1 unit of futures from $t_{0}$, we will have the following strategy.\par 
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{screenshot001}
+	\caption{Dynamic Hedging Strategy of Futures}
+	\label{fig:screenshot001}
+\end{figure}
+
+\subsection{The relation of Futures Prices to Forward Prices}
+ There are three facts:\par 
+ \bigbreak 
+ (1) The futures price is a martingale under risk-neutral measure.\par 
+ (2) The forward price is a martingale under Zero-Coupon Bonds as a numeriaire.\par 
+ (3) When interest rate is non-random, the futures price is equal to the forward price.\par 
+ \bigbreak 
+ Prof (1). Consider a portfolio, long a futures with reinvesting and withdrawing from a money account with risk-free rate r.\par 
+ $$
+dV = dF^{*} + rVdt
+ $$ 
+ Then $$
+ \begin{aligned}
+ \dfrac{d(V/R)}{V/R} &= \dfrac{dV}{V} - \dfrac{dR}{R} \\
+ &=\dfrac{dF^{*}}{V}
+ \end{aligned}
+ $$
+ the drift of $\dfrac{dF^{*}}{V} $ is zero implies the drifts of $dF^{*}$ is zero. \par 
+ \bigbreak 
+ Prof (2). Recall the forward price $F(t) = \dfrac{e^{-qT}S(t)}{P(t, T)} $, $P(t, T)F(t)$ is a non-dividend paying assets, so $\dfrac{P(t,T)F(t)}{P(t,T)} = F(t)$ is a martingale.\par 
+ \bigbreak 
+ Prof(3) Assume interest rate is non random,
+ $$
+\mathbb{P}^{R}_{A} = \mathbb{E}^{P}(1_{A}\phi(T)\dfrac{P(T,T)}{P(0, T)}) = \exp(\int^{T}_{0}r(u)du)\mathbb{E}^{P}(1_{A}\phi(T))
+ $$
+ $$
+\mathbb{P}^{R}_{A} = \mathbb{E}^{R}(1_{A}\phi(T)\dfrac{R(T)}{R(0)}) = \exp(\int^{T}_{0}r(u)du)\mathbb{E}^{R}(1_{A}\phi(T))
+ $$
+ So,
+ $$
+F^{*}(t) = \mathbb{E}^{R}(F^{*}(T)) =  \mathbb{E}^{P}(F^{*}(T)) = \mathbb{E}^{P}(F(T)) = \mathbb{E}^{R}(F(T)) = F(t)
+ $$
+ \subsubsection{Extension. (1)}
+ The difference between futures and forward is 
+ $$
+\begin{aligned}
+F^{*}(t) - F(t) &= \mathbb{E}^{R}[S_{T}] - \dfrac{S_{t}}{P(t, T)}\\
+&=\dfrac{\mathbb{E}^{R}[S_{T}]\mathbb{E}^{R}[P(t, T)] - \mathbb{E}^{R}[P(t, T)S_{T}]}{P(t, T)}\\
+&=-\dfrac{cov[P(t,T), S_{T}]}{P(t, T)}
+\end{aligned}
+ $$
+\subsection{Futures Option}
+The difference between forward option and futures option is that futures option is mark to market. So, the payoff of futures option in Margarabe's formula is \par 
+$$
+S_{1} = P(0, T)F^{*}(0)\quad and \quad  S_{2} = P(0,T)K
+$$ 
+Substitute into the Margrabe's formula, the \textbf{call option} price is \par 
+$$
+P(0,T)F^{*}(0)N(d_{+}) - P(0, T)KN(d_{-})
+$$
+\hfill where $d_{+} = \dfrac{\log(\dfrac{F^{*}(0)}{K}) + \frac{1}{2}\sigma^{2}}{\sigma\sqrt{T}}$.
+\subsection{Hedging with Forward and Futures}
+Let $t<u$, consider the portfolio purchase $x(t)$ forward at $F(t)$ and sell $x(t)$ forward at u with $F(u)$. Since entering a forward contract is free that the PV at time u of portfolio is\par 
+$$
+\begin{aligned}
+x(t)P(u, T)(F(u) - F(t))&=x(t)\left[P(t,T)\left[F(u)-F(t)\right]+ \left[P(u,T) - P(t,T)\right]\left[F(u)-F(t)\right]\right] \\
+&=x(t)\left[P(t,T)\Delta F + (\Delta P)(\Delta F)\right]
+\end{aligned}
+$$
+which can be written as \par 
+$$
+x(t)\left[P(t,T)dF(t) + dP(t,T)\times dF(t)\right]
+$$
+Change of futures price is simpler\par 
+$$
+x(t)dF^{*}(t)
+$$
+The value doesn't need to discount since futures is mark to market.\par 
+\bigbreak 
+Assume the risk free rate is constant, \par                 
+\bigbreak
+\noindent-------------------------------------------------------------\par
+\noindent Change of Forward\par 
+$$
+x(t)e^{r(T-t)}dF(t)
+$$\par 
+\noindent Change of Futures\par 
+$$
+x(t)dF^{*}(t)\quad, where\quad F^{*}(t) = F(t)
+$$
+-------------------------------------------------------------\par 
+\bigbreak 
+\bigbreak 
+Finally, we conclude if x(t) is the number of forward contracts should be hedged, then $e^{-r(T-t)}x(t)$ is the number of futures should be hedges.\par 
+\subsection{TBC}
+Sect. 7.6 \& Sect. 7.10
+\section{Fixed Income}
+\subsection{The yield curve}
+Define $y(t)$ as the yield at t,\par 
+$$
+P(t, T) = e^{-y(t)(T-t)}
+$$
+Then let $\tau_{1}<\tau_{2}<...<\tau_{N},$\par 
+$$
+P = \sum^{N}_{j=1}e^{-y(\tau_{j})\tau_{j}}C_{j}
+$$
+The we can use cubic spline to fit the yield curve\par 
+$$
+y(t) = \left\{
+	\begin{aligned}
+	&a_{0}t^{3} + b_{0}t^{2} + c_{0}t + d_{0}\quad ,\quad 0<t<t_{1}\\
+	&a_{1}t^{3} + b_{1}t^{2} + c_{1}t + d_{1}\quad ,\quad t_{1}<t<t_{2}\\
+		&a_{2}t^{3} + b_{2}t^{2} + c_{2}t + d_{2}\quad ,\quad t_{2}<t<t_{3}\\
+		&...\\	
+	\end{aligned}\right.
+$$
+And use the Equality of yields, first order derivatives and second order derivatives to iteratively compute the parameter set.
+\subsection{Spot Rate, Swap Rate and Forward Rate}
+\noindent Spot Rate\par 
+$$
+\dfrac{1}{P(t,u)} = 1 + \mathcal{R}(u-t)
+$$\par 
+\bigbreak 
+\noindent Swap Rate\par 
+Consider the value of swap for fixed payer
+$$
+P(t, t_{0}) - P(t, t_{N}) - \Delta t \bar R \sum^{N}_{i=1} P(t, t_{i})
+$$
+where $P(t,t_{0})$ is the cost of receiving \$1 at $t_{0}$.\par 
+\bigbreak 
+Forward Rate\par 
+\bigbreak 
+$$
+\dfrac{P(t,u)}{P(t,u+\Delta t)} = 1 + R\Delta t
+$$
+\subsection{Duration and Convexity}
+$$
+\dfrac{dP}{P} =  -Duration\times dy
+$$
+$$
+Convexity = \dfrac{1}{P}\dfrac{d^{2}P}{dy^{2}}
+$$
+\subsection{Duration Hedge}
+Assume the portfolio price equals\par 
+$$
+P = f(t, y(t))
+$$
+$$
+dP = P_{t}dt + P_{y}dy + \frac{1}{2}P_{yy}(dy)^{2}
+$$
+which can be written as\par 
+$$
+dP = P_{t}dt - Duration\times P + \frac{1}{2}P_{yy}(dy)^{2}
+$$
+\subsection{Caps and Floors}
+For a Caps, the buyer's cash flow at each reset date $t_{i}$ is 
+$$
+P(t_{i}, t_{i + 1})\max(R(t_{i})-\bar R,0)
+$$
+For Floors, 
+$$
+P(t_{i}, t_{i + 1})\max(\bar R - R(t_{i}), 0)
+$$
+\subsubsection{The Market Model of Caps}
+We can regard the float leg is an asset, since $R(t_{i})\Delta t$ can be replicated by $P(t, t_{i}) - P(t, t_{i + 1})$ at $t<t_{i}$ and $P(t, t_{i+1})R_{i}\Delta t$ at $t>t_{i}$.\par 
+$$
+S_{i}(t) = \left\{\begin{aligned}
+&P(t, t_{i}) - P(t, t_{i+1}), \quad t<t_{i}\\
+&P(t, t_{i+1})R_{i}\Delta t, \quad t_{i}<t<t_{i+1}
+\end{aligned}\right.
+$$\par 
+$$
+F_{i}(t) = \left\{\begin{aligned}
+&\dfrac{P(t, t_{i})}{P(t, t_{i+1})} - 1, \quad t<t_{i}\\
+&R_{i}\Delta t, \quad t_{i}<t<t_{i+1}
+\end{aligned}\right.
+$$\par 
+Recall the black's formula,
+$$
+\text{Value of Caps} = P(0, t_{i+1})R_{i}(0)N(d_{1}) - P(0, t_{i+1})\bar R
+$$\par 
+where $d_{1} = \dfrac{\log(R_{i}(0)/\bar R) + \frac{1}{2}\sigma^{2}t_{i}}{\sigma \sqrt{t^{i}}}$.
+\subsection{Swaptions}
+Consider a swap with maturity at $t_{N}$,\par 
+\bigbreak 
+\noindent Fixed leg: \par 
+$$
+Z(t) = \sum_{i=1}^{N}P(t, t_{i})\bar R\Delta t
+$$
+\bigbreak 
+\noindent Floating leg: \par 
+$$
+S(t) = P(t, t_{1}) - P(t, t_{N})
+$$\par 
+\bigbreak
+\noindent Its payoff \par 
+$$
+\max(S(t) - Z(t), 0)
+$$
+Since we can write S(t) under Z(t) as a numeriaire,\par 
+$$
+\dfrac{S(t)}{Z(t)} = \dfrac{\mathcal{R}\Delta t\sum_{i=1}^{N}P(t, t_{i})}{\sum_{i=1}^{N}P(t, t_{i})\bar R\Delta t}=\dfrac{\mathcal{R}}{\bar R}
+$$ and assume swap rate $\mathcal{R}$ has constant volatility $\sigma$. The present value of swaptions for a payer is\par 
+$$
+(P(t, t_{1} - P(t,t_{N}))) N(d_{_{+}}) - \bar R\Delta t \sum_{i=1}^{N}P(t, t_{i}) N(d_{-})
+$$\par 
+where $d_{+} = \dfrac{\log(P(t, t_{1} - P(t,t_{N}))) -\log(\bar R\Delta t \sum_{i=1}^{N}P(t, t_{i}) ) + \frac{1}{2}\sigma^{2} }{\sigma\sqrt{t_{N}}}$
+\appendix
+\section{Fundamental Assets Pricing Formula}
+For arbitrary non-dividends paying assets matured at T, we have its price \par 
+$$
+V(t) = \mathbb{E}[V(T)|\mathcal{F}_{t}]
+$$\par 
+and we know that if use risk-free asset as a numeraire, $R(t) = e^{-\int^{T}_{t}rds}$, the ratio of V and R is a martingale under risk neutral measure,\par 
+$$
+\mathbb{E}^{R}[\dfrac{V(T)}{R(T)}|\mathcal{F}_{t}] = \mathbb{E}^{R}[\dfrac{V(T)}{R(T)}]
+$$
+So, the asset price is \par 
+$$
+V(t) = \mathbb{E}^{R}[V(T)|\mathcal{F}_{t}] =  R(t)\mathbb{E}^{R}[\dfrac{V(T)}{R(T)}|\mathcal{F}_{t}]=  R(t)\mathbb{E}^{R}[\dfrac{V(T)}{R(T)}]
+$$
+\section{Feyman-Kac Formula}
+\subsection{Simplified Version}
+Consider a PDE is written as follows\par 
+$$
+\frac{\partial F}{\partial t}+\mu(X, t) \frac{\partial F}{\partial X}+\frac{\sigma^{2}(X, t)}{2} \frac{\partial^{2} F}{\partial X^{2}}=0
+$$\par
+subject to the terminal condition\par 
+$$F(X(T), T)=h(X(T))$$
+\bigbreak
+\noindent Suppose the Ito process $X(t)$ is governed by the differential equation \par 
+$$
+d X(s)=\mu(X(s), s) d s+\sigma(X(s), s) d Z(s), \quad t \leq s \leq T
+$$\par 
+with initial condition:$ X(t)=x$\par 
+\bigbreak
+\noindent Consider a smooth function $F(X(t), t)$, by Ito Lemma,
+$$
+d F=\left[\frac{\partial F}{\partial t}+\mu(X, t) \frac{\partial F}{\partial X}+\frac{\sigma^{2}(X, t)}{2} \frac{\partial^{2} F}{\partial X^{2}}\right] d t+\sigma \frac{\partial F}{\partial X} d Z
+$$
+Recall the PDE in the beginning, 
+$$
+d F=\sigma \frac{\partial F}{\partial X} d Z
+$$\par 
+Combing the termination condition $F(X(T), T)=h(X(T))$,
+$$
+F(x, t)=E_{x, t}[h(X(T))], \quad t<T
+$$
+\subsection{General Version}
+Consider the partial differential equation\par 
+$$
+\frac{\partial u}{\partial t}(x, t)+\mu(x, t) \frac{\partial u}{\partial x}(x, t)+\frac{1}{2} \sigma^{2}(x, t) \frac{\partial^{2} u}{\partial x^{2}}(x, t)-V(x, t) u(x, t)+f(x, t)=0
+$$\par 
+\noindent defined for all $x\in \mathbb{R}$ and $t\in[0,T]$, subject to the terminal condition\par 
+$$
+u(x, T)=\psi(x)
+$$\par 
+\noindent The solution of the above PDE is \par 
+$$
+u(x, t)=E^{Q}\left[\int_{t}^{T} e^{-\int_{t}^{T} V\left(X_{\tau}, \tau\right) d \tau} f\left(X_{r}, r\right) d r+e^{-\int_{t}^{T} V\left(X_{\tau}, \tau\right) d \tau} \psi\left(X_{T}\right) \mid X_{t}=x\right]
+$$\par 
+\bigbreak 
+\bigbreak
+\begin{proof}
+Consider a partial differential equation\par 
+$$
+\frac{\partial u}{\partial t}(x, t)+\mu(x, t) \frac{\partial u}{\partial x}(x, t)+\frac{1}{2} \sigma^{2}(x, t) \frac{\partial^{2} u}{\partial x^{2}}(x, t)-V(x, t) u(x, t)+f(x, t)=0
+$$\par 
+\bigbreak 
+\noindent Assume the solution of this PDE is $u(X_{t}, t)$, we can construct a process \par 
+$$
+Y(s)=e^{-\int_{t}^{s} V\left(X_{\tau}, \tau\right) d \tau} u\left(X_{s}, s\right)+\int_{t}^{s} e^{-\int_{t}^{r} V\left(X_{\tau}, \tau\right) d \tau} f\left(X_{r}, r\right) d r
+$$\par 
+\bigbreak 
+\noindent and take the partial differential of $Y(t)$ by Ito Lemma, we have \par 
+$$
+\begin{aligned}
+d Y=& d\left(e^{-\int_{t}^{s} V\left(X_{\tau}, \tau\right) d \tau}\right) u\left(X_{s}, s\right)+e^{-\int_{t}^{s} V\left(X_{\tau}, \tau\right) d \tau} d u\left(X_{s}, s\right) \\
+&+d\left(e^{-\int_{t}^{s} V\left(X_{\tau}, \tau\right) d \tau}\right) d u\left(X_{s}, s\right)+d\left(\int_{t}^{s} e^{-\int_{t}^{r} V\left(X_{\tau}, \tau\right) d \tau} f\left(X_{r}, r\right) d r\right)
+\end{aligned}
+$$\par 
+$$
+\begin{aligned}
+d Y=& e^{-\int_{t}^{s} V\left(X_{\tau}, \tau\right) d \tau}\left(-V\left(X_{s}, s\right) u\left(X_{s}, s\right)+f\left(X_{s}, s\right)+\mu\left(X_{s}, s\right) \frac{\partial u}{\partial X}+\frac{\partial u}{\partial s}+\frac{1}{2} \sigma^{2}\left(X_{s}, s\right) \frac{\partial^{2} u}{\partial X^{2}}\right) d s \\
+&+e^{-\int_{t}^{s} V\left(X_{\tau}, \tau\right) d \tau} \sigma(X, s) \frac{\partial u}{\partial X} d W
+\end{aligned}
+$$\par 
+\noindent Then we can substitute the PDE in the beginning to make the terms in parentheses is zero, and get \par 
+$$
+d Y=e^{-\int_{t}^{s} V\left(X_{\tau}, \tau\right) d \tau} \sigma(X, s) \frac{\partial u}{\partial X} d W
+$$\par 
+After integration and expectation\par 
+$$
+E\left[Y(T) \mid X_{t}=x\right]=E\left[e^{-\int_{t}^{T} V\left(X_{\tau}, \tau\right) d \tau} u\left(X_{T}, T\right)+\int_{t}^{T} e^{-\int_{t}^{r} V\left(X_{\tau}, \tau\right) d \tau} f\left(X_{r}, r\right) d r \mid X_{t}=x\right]
+$$
+\end{proof}
+\end{document}
+
+

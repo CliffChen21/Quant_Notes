@@ -1,0 +1,299 @@
+\documentclass[a4]{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{xcolor}
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{figures/}}
+\usepackage{graphicx}
+\title{Market Microstructure}
+\author{Cliff}
+
+% Make prettier tables.
+\usepackage{booktabs}
+
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{units}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+
+
+%%% Custom Commands
+%---------------------------------------------------------------------------
+% Concise referencing
+\newcommand{\eqnref}[1]{\eqref{#1}}
+\newcommand{\secref}[1]{Section \ref{#1}}
+\newcommand{\figref}[1]{Figure \ref{#1}}
+\newcommand{\lemref}[1]{Lemma \ref{#1}}
+\newcommand{\corref}[1]{Corollary \ref{#1}}
+\newcommand{\thmref}[1]{Theorem \ref{#1}}
+% Real numbers
+\newcommand{\Real}[1]{\mathbb{R}^{#1}}
+% Complex numbers
+\newcommand{\Complex}[1]{\mathbb{C}^{#1}}
+% Integers
+\newcommand{\Integer}[1]{\mathbb{Z}^{#1}}
+% Rank operator
+\DeclareMathOperator{\rank}{\textnormal{rank}}
+% Vec operator
+\newcommand{\vecop}{\textnormal{vec}}
+% Norm
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+% Trace
+\newcommand{\trace}{\textnormal{tr}}
+% Range
+\newcommand{\range}{\textnormal{range}}
+% Partial derivative
+\newcommand{\pd}[2]{\dfrac{\partial #1}{\partial #2}}
+% Complete derivative
+\newcommand{\dd}[2]{\dfrac{d #1}{d #2}}
+% Complete derivative, second order
+\newcommand{\dds}[2]{\dfrac{d^2 #1}{d {#2}^2}}
+% Limit to N / N
+\newcommand{\limover}[1]{\lim_{#1 \rightarrow \infty} \dfrac{1}{#1}}
+% Display style sum
+\newcommand{\dsum}{\displaystyle\sum}
+% arg min and arg max
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg~max}}}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg~min}}}
+%---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{example}
+\newtheorem{corollary}{Corollary}
+\begin{document}
+\tableofcontents
+\newpage
+\maketitle
+\section{Preliminary}
+\subsection{Poisson \& Exponential Distribution}
+\subsubsection{Poisson Distribution}
+A discrete random variable $X$ is said to have a Poisson distribution with parameter
+$\lambda>0$ if for $k=0,1,2, \ldots,$ the probability mass function of $X$ is given by:\par 
+$$
+f(k ; \lambda)=\operatorname{Pr}(X=k)=\frac{\lambda^{k} e^{-\lambda}}{k !}
+$$\par 
+where $\lambda $ is the arrival rate, k is he number of occurrences, within a time interval.\par 
+$$
+Var(X) = E(X) = \lambda 
+$$ 
+\subsubsection{Exponential Distribution}
+The probability density function of an exponential distribution is \par 
+$$
+f(x;\lambda) = \left\{ \begin{aligned}
+\lambda e^{-\lambda x}\quad &x\geq 0,\\
+0\quad &x<0,\\
+\end{aligned}\right.
+$$
+and its cdf is \par 
+$$
+F(x ; \lambda)=\left\{\begin{array}{ll}
+1-e^{-(\lambda x)} & x \geq 0 \\
+0 & x<0
+\end{array}\right.
+$$
+with Mean and Variance\par 
+$$
+\mathrm{E}[X]=\frac{1}{\lambda}\quad Var[X] =\dfrac{1}{\lambda ^{2}}
+$$
+\subsubsection{Connection}
+\begin{itemize}
+	\item $N_{t}$: the number of arrivals during time period t. 
+	\item $X_{t}$: the time it takes for one additional arrival to arrive assuming that someone arrived at time t.
+\end{itemize}
+Be definition, the following conditions are equivalent:\par 
+$$
+\left(X_{t}>x\right) \equiv\left(N_{t}=N_{t+x}\right)
+$$\par 
+By the complement rule, we also have\par 
+$$
+P\left(X_{t} \leq x\right)=1-P\left(X_{t}>x\right)
+$$\par 
+$$
+\begin{aligned}
+&P\left(X_{t} \leq x\right)=1-P\left(N_{t+x}-N_{t}=0\right)\\
+&\text { But, }\\
+&P\left(N_{t+x}-N_{t}=0\right)=P\left(N_{x}=0\right)
+\end{aligned}
+$$\par 
+Using the poisson pmf the above where $\lambda$ is the average number of arrivals per time unit and x a quantity of time units, simplifies to: \par 
+$$
+P\left(N_{t+x}-N_{t}=0\right)=\frac{(\lambda x)^{0}}{0 !} e^{-\lambda x}
+$$
+Substituting in our original eqn, we have:
+$$
+P\left(X_{t} \leq x\right)=1-e^{-\lambda x}
+$$
+The above is the cdf of a exponential pdf.
+\section{Inventory Models}
+\subsection{Garman's Model}
+\textbf{Assumptions}
+\begin{itemize}
+	\item Dealer structure \& double auction mechanism.
+	\item Market maker only decide on the ask price, $p_{a}$ and bid price, $p_{b}$.
+	\item Orders are represented as independent stochastic process with stationary arrival function $\lambda _{a}(p)$  and $\lambda _{b}(p)$ .
+	\item Market maker is not permitted by borrowing or lending.
+	\item Poisson order arrival rates essentially require that (1) there are a large number of agents in the market; (2) each agent acts independently in submitting order; (3) no agent can generate an infinite number of orders in a finite period; (4) no subset of agents can dominate order generation.
+\end{itemize}
+\textbf{Order arriving theory}\par
+\bigbreak 
+Let $N_{a}(t)$ (or $N_{b}(t)$) be the cumulative numbers of shares that have sold (or bought) to traders up to time t. Then inventories are governed by\par 
+$$
+I_{c}(t) = I_{c}(0) + p_{a}N_{a}(t) - p_{b}N_{b}(t)
+$$\par 
+and 
+$$
+I_{s}(t) = I_{s}(0) + N_{b}(t) - N_{a}(t)
+$$\par  
+Then define\par 
+$$
+\begin{aligned}
+&Q_{k}(t) := \mathbb{P}[I_{c}(t)=k]\\
+&R_{k}(t) :=\mathbb{P}[ I_{s}(t)=k]
+\end{aligned}
+$$\par 
+And if market maker hold k units of cash/stocks at time t, the previous state would be\par 
+\begin{itemize}
+	\item I = k-1, at t - $\Delta t$, with an sell order arrives in the next instance.
+	\item I = k + 1, at t - $\Delta t$, with an buy order arrives in the next instance.
+	\item I = k, at t - $\Delta t$, nothing happens in the next instance.
+\end{itemize}\par 
+By assume the arrive rate as $\lambda_{a}p_{a}$, the probability of the market maker holds exactly k unit stocks at time t would be\par 
+\begin{itemize}
+	\item $ Q_{k-1}(t - \Delta t)[\lambda _{a}(p_{a})p_{a}\Delta t][1-\lambda_{b}(p_{b})p_{b}\Delta t]$
+	\item  $ Q_{k+1}(t - \Delta t)[1-\lambda _{a}(p_{a})p_{a}\Delta t][\lambda_{b}(p_{b})p_{b}\Delta t]$
+	\item  $ Q_{k}(t - \Delta t)[1-\lambda _{a}(p_{a})p_{a}\Delta t][1-\lambda_{b}(p_{b})p_{b}\Delta t]$
+\end{itemize}\par 
+Summing them up,\par 
+$$
+\begin{aligned}
+Q_{k}(t) &=  Q_{k-1}(t - \Delta t)[\lambda _{a}(p_{a})p_{a}\Delta t][1-\lambda_{b}(p_{b})p_{b}\Delta t] \\
+& + Q_{k+1}(t - \Delta t)[1-\lambda _{a}(p_{a})p_{a}\Delta t][\lambda_{b}(p_{b})p_{b}\Delta t]\\
+& + Q_{k}(t - \Delta t)[1-\lambda _{a}(p_{a})p_{a}\Delta t][1-\lambda_{b}(p_{b})p_{b}\Delta t]
+\end{aligned}
+$$\par 
+To calculate the time derivative of the probability $Q_{k}(t)$, we take the limit as $\Delta t\rightarrow0$ of $Q_{k}(t) - Q_{k}(t-\Delta t)/\Delta t$. This yields\par 
+$$
+\begin{aligned}
+\dfrac{\partial Q_{k}(t)}{\partial t} &= Q_{k-1}(t)[\lambda_{a}(p_{a})p_{a}] + Q_{k+1}(t)[\lambda_{b(p_{b})p_{b}}]\\&-Q_{k}(t)[\lambda_{a}(p_{a})p_{a}+\lambda_{b}(p_{b})p_{b}]
+\end{aligned}
+$$
+\subsubsection{The Gambler's Ruin Problem}
+\label{Gambler Ruin Problem}
+Let's denote $\mathbb{P}[F|S]$ as the failure probability while holding $S$ units of stock.\par 
+$$
+\mathbb{P}[F|S] = q\mathbb{P}[F|S-1] + p\mathbb{P}[F|S+1]
+$$
+The solution to this difference equation yields the general expected failure probability\par 
+$$
+\mathbb{P}[F|S_{0}] = \left(\dfrac{q}{p}\right)^{S_{0}}
+$$
+\subsubsection{The Market Maker's Ruin Problem}
+In the continuous time context\par 
+$$
+\begin{aligned}
+\lim_{t\rightarrow \infty}Q_{0}(t)\approx \left(\dfrac{\lambda_{b}(p_{b})p_{b}}{\lambda_{a}(p_{a})p_{a}}\right)^{I_{c}(0)/\bar{p}}&\quad \text{ if } \lambda_{a}(p_{a})p_{a}>\lambda_{b}(p_{b})p_{b},\\=1 &\quad  \text{ otherwise}
+\end{aligned}
+$$\par 
+where $\bar{p}$ is defined to be the average price.\par 
+$$
+\begin{aligned}
+\lim_{t\rightarrow \infty}R_{0}(t)\approx \left(\dfrac{\lambda_{a}(p_{a})}{\lambda_{b}(p_{b})}\right)^{I_{s}(0)}&\quad \text{ if } \lambda_{b}(p_{b})>\lambda_{a}(p_{a}),\\=1 &\quad  \text{ otherwise}
+\end{aligned}
+$$\par 
+\noindent \textbf{Notes}\par 
+\bigbreak 
+We can substitute the above equations into equation at Sect \ref{Gambler Ruin Problem}
+$$
+\left(\dfrac{qp_{b}}{\pi p_{a}}\right)^{\frac{w}{p}} = q\left(\dfrac{qp_{b}}{\pi p_{a}}\right)^{\frac{w-p_{b}}{\bar{p}}} + \pi\left(\dfrac{qp_{b}}{\pi p_{a}}\right)^{\frac{w+p_{a}}{\bar{p}}}
+$$\par 
+\bigbreak
+\noindent In this framework, the dealer's failure probability is always positive, and in some circumstances, the dealer fails with probability one.\par 
+\bigbreak 
+\noindent So the requirements of bid\& ask which  dealer should set are:\par 
+$$
+\begin{aligned}
+\lambda_{a}(p_{a})p_{a}&>\lambda_{b}(p_{b})p_{b}\\
+\lambda_{a}(p_{a})&<\lambda_{b}(p_{b})
+\end{aligned}
+$$\par 
+\noindent It implies that the market maker would buy low (bid price) and sell high (ask price).
+\subsection{The dealer's problem}
+One way to analyze the dealer's decision making is through risk, utility and dealer's optimal behavior. And it can be regarded as the compensation of specialist service of providing immediacy. Instead of assuming market maker as a risk neutral monopolist in Garman's model, Stoll assumed dealer as a risk averse trader who need to be paid by taking risk which was the cost derived by the bid-ask spread.\par 
+The cost can be divided into three points: (1) holding costs from suboptimal portfolio position; (2) transaction cost from exchange fees, taxes, etc; (3) asymmetric information, some counter-parties might have more knowledge on stocks.\par 
+\noindent\begin{theorem}[Stoll's 2-date model]\par 
+\bigbreak 
+	\begin{itemize}	\textbf{Assumption}
+		\item Unlimited lending/borrowing at risk free rate, $R_{f}$.
+		\item Dealer holds a belief on "true" price.
+		\item Dealer buys/sells the asset at time 1, and liquids the asset at time 2.
+	\end{itemize}\par 
+\bigbreak
+Let's denote as \begin{itemize}
+	\item $W_{0}$: initial position of efficient optimal portfolio.
+	\item $R_{f}$: risk-free rate.
+	\item $Q_{p}$: true value of dealer's trading account with any remaining fund.
+	\item $C_{i}$: dealer's exposure cost of holding sub optimal portfolio.
+	\item $Q_{i}$: true value of stock position (true stock price $\times$ shares).
+	
+\end{itemize}
+Then the dealer's terminal wealth is presented as\par 
+\begin{equation}
+\tilde{W} = W_{0}(1+\tilde{R}^{*}) + (1+\tilde{R}_{i})Q_{i} - (1+R_{f})(Q_{i}-C_{i})
+\end{equation}\par 
+The dealer is assumed to be willing to undertake any transactions that leaves his expected utility unchanged.\par 
+\begin{equation}
+E[U(W_{0}(1+\tilde{R}^{*}))] = E[U(\tilde{W})]
+\end{equation}
+and simplify by taylor expansion,\par 
+\begin{equation}
+\frac{C_{i}}{Q_{i}} = c_{i}= \frac{z}{W_{0}}\sigma_{ip}Q_{p} + \frac{1}{2}\frac{z}{W_{0}}\sigma_{i}^{2}Q_{i}
+\end{equation}
+\begin{itemize}
+	\item $z$ is the dealer's coefficient of relative risk aversion.
+	\item $Q_{p}$ dealer's total inventory.
+	\item $\sigma_{ip}$ is the correlation between the rate of return on stock i and the rate of return on the optimal efficient portfolio.
+	\item $\sigma_{i}^{2}$ is the variance of stock i's return .
+\end{itemize}\par 
+\bigbreak 
+In the end, the bid \& ask prices can be expressed as \par 
+\begin{equation}
+(P^{*}_{i}-P_{b})/P^{*}_{i} = c_{i}(Q_{i}^{b})
+\end{equation}\par 
+and 
+\begin{equation}
+(P_{a}-P_{b})/P_{i}^{*} = c_{i}(Q_{i}^{b}) - c_{i}(Q_{i}^{a}) = [z/W_{0}]\sigma_{i}^{2}|Q| \quad for \quad |Q_{i}^{a}| = |Q_{i}^{b}| = |Q|
+\end{equation}
+where $P_{i}^{*}$ is the "true" price.
+\end{theorem}\par 
+\noindent This theorem illustrates several interest features of the bid-ask spread, \par 
+(1) The spread increases linearly with the trading size; \par 
+(2) this spread does not change in response to the inventory as an argument, but inventory decides the position of spread; \par \bigbreak 
+\noindent The larger inventory causes higher cost for absorbing more inventory, and verse vice.\par 
+\subsection{The intertemporal role of inventory}
+In Stoll[1978], the model assumes that the true value of the stock is fixed at some value p, and so the dealer's prices can be written as $p_{a}=p+a$ and $p_{b}=p-b$. Without any transactions, the value of dealer's portfolio is \par 
+\begin{equation}
+dX = r_{X}Xdt + XdZ_{X}
+\end{equation}\par 
+where $r_{X}$ is the mean return per unit of time, and $Z_{X}$ is a Wiener process with mean zero and instantaneous variance rate $\sigma^{2}_{X}$.\par 
+And the value of cash account, F\par 
+\begin{equation}
+dF = rFdt - (p-b)dq_{b} + (p+a)dq_{a}
+\end{equation}\par 
+where $q_{b}$ and $q_{a}$ are dealer buys and sales of securities, respectively. Similarly, the value of the dealer's inventory position, I, follows\par 
+\begin{equation}
+dI = r_{I}Idt + pdq_{b} - pdp_{a}+IdZ_{I}
+\end{equation}\par 
+\noindent There're two interesting features, \par 
+\bigbreak 
+(1) The inventory position doesn't change with the bid\&ask price, but in its intrinsic price.\par 
+(2) The value of inventory doesn't change due to both changes in its size and changes in its value resulting from the diffusion term $IdZ_{I}$ and the drift term $r_{I}Idt$.
+\end{document}

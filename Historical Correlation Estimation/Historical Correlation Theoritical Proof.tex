@@ -1,0 +1,185 @@
+\documentclass{article}[a4]
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{xcolor}
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{figures/}}
+
+\title{Historical Correlation Estimation}
+\author{Cliff}
+
+% Make prettier tables.
+\usepackage{booktabs}
+
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{amsmath}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+
+
+%%% Custom Commands
+%---------------------------------------------------------------------------
+% Concise referencing
+\newcommand{\eqnref}[1]{\eqref{#1}}
+\newcommand{\secref}[1]{Section \ref{#1}}
+\newcommand{\figref}[1]{Figure \ref{#1}}
+\newcommand{\lemref}[1]{Lemma \ref{#1}}
+\newcommand{\corref}[1]{Corollary \ref{#1}}
+\newcommand{\thmref}[1]{Theorem \ref{#1}}
+% Real numbers
+\newcommand{\Real}[1]{\mathbb{R}^{#1}}
+% Complex numbers
+\newcommand{\Complex}[1]{\mathbb{C}^{#1}}
+% Integers
+\newcommand{\Integer}[1]{\mathbb{Z}^{#1}}
+% Rank operator
+\DeclareMathOperator{\rank}{\textnormal{rank}}
+% Vec operator
+\newcommand{\vecop}{\textnormal{vec}}
+% Norm
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+% Trace
+\newcommand{\trace}{\textnormal{tr}}
+% Range
+\newcommand{\range}{\textnormal{range}}
+% Partial derivative
+\newcommand{\pd}[2]{\dfrac{\partial #1}{\partial #2}}
+% Complete derivative
+\newcommand{\dd}[2]{\dfrac{d #1}{d #2}}
+% Complete derivative, second order
+\newcommand{\dds}[2]{\dfrac{d^2 #1}{d {#2}^2}}
+% Limit to N / N
+\newcommand{\limover}[1]{\lim_{#1 \rightarrow \infty} \dfrac{1}{#1}}
+% Display style sum
+\newcommand{\dsum}{\displaystyle\sum}
+% arg min and arg max
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg~max}}}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg~min}}}
+%---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\maketitle
+\begin{abstract}
+	The document discussed the difference between weekly esimation and daily estimation on historical correlation with assumption that assets were traded continously.
+\end{abstract}
+\section{Assumptions}
+For simplicity, we assumed the interest rates satisfy normal distribution and their covariance matrix were constant. Let $\mathbf{X},\mathbf{Y}$ be two normal random variables, and $X, Y$ be their sample path from 1 to T, which they can also be the sample paths of interest rates.\par 
+
+\begin{equation}
+\mathbf{X}\sim \mathcal{N}(\mu, \sigma^{2}),\quad \mathbf{Y}\sim \mathcal{N}(\mu ', \sigma'^{2})
+\end{equation}\par 
+And assmued there were N weeks in the history, then $T = 7N$, and\par 
+\begin{equation}
+\begin{aligned}
+X &= (x_{1}, x_{2},x_{3},...,x_{7N})\\
+Y &=(y_{1},y_{2},y_{3},...,y_{7N})
+\end{aligned}
+\end{equation}\par 
+Since the interest rates in weekend are not visible, the daily raturn series can be expressed as below,\par 
+\begin{equation}\label{daily}
+\begin{aligned}
+X^{w} &= (x_{2},x_{3},x_{4},x_{5},x_{6}+x_{7}+x_{8}, x_{9},x_{10}, x_{11},x_{12}, ...,x_{7N-2})\\
+Y^{w} &= (y_{2},y_{3},y_{4},y_{5},y_{6}+y_{7}+y_{8}, y_{9},y_{10}, y_{11},y_{12}, ...,y_{7N-2})
+\end{aligned}
+\end{equation}\par 
+And the weekly return was \par 
+\begin{equation}\label{weekly}
+\begin{aligned}
+X^{w} &= (\sum_{m=0}^{6}x_{1+m}, \sum_{m=0}^{6}x_{2+m},\sum_{m=0}^{6}x_{3+m},...,\sum_{m=0}^{6}x_{7N-6+m})\\
+Y^{w} &= (\sum_{m=0}^{6}y_{1+m}, \sum_{m=0}^{6}y_{2+m},\sum_{m=0}^{6}y_{3+m},...,\sum_{m=0}^{6}y_{7N-6+m})\\
+\end{aligned}
+\end{equation}\par 
+\section{Sample Covariance}
+Since we know, \par 
+$$
+Correl(X,Y) = \dfrac{Cov(X,Y)}{\sqrt{Var(X)}\sqrt{Var(Y)}}
+$$\par 
+and\par 
+$$
+Var(X) = Cov(X,X)
+$$\par 
+we could directly compared the covariance between these methods, and the sample covariance was \par 
+\begin{equation}
+Cov(X,Y) = \dfrac{\sum^{N}_{i=1}(X_{i}-\bar{X})(Y_{i}-\bar{Y})}{N-1}=\dfrac{\sum^{N}_{i=1}X_{i}Y_{i}}{N-1} - \dfrac{N\bar{X}\bar{Y}}{N-1}
+\end{equation}
+\section{Analysis}
+\subsection{Daily Estimation}
+Recall the formula (\ref{daily}), it can be generalized as \par 
+\begin{equation}
+\begin{aligned}
+X^{d}&=({x_{n+1}, x_{n+2}, x_{n+3},x_{n+4},\sum_{m=0}^{2}x_{n+m+5}})_{n=1}^{N}\\
+Y^{d}&=({y_{n+1}, y_{n+2}, y_{n+3},y_{n+4},\sum_{m=0}^{2}y_{n+m+5}})_{n=1}^{N}
+\end{aligned}
+\end{equation}\par 
+\begin{equation}
+\begin{aligned}
+Cov(X^{d},Y^{d})&=\mathbb{E}\{X^{d}Y^{d}\} - \mathbb{E}\{X^{d}\}\mathbb{E}\{Y^{d}\} \\
+\end{aligned}
+\end{equation}
+and its covariance is\par 
+\begin{equation}
+\begin{aligned}
+\hat{Cov}(X^{d},Y^{d}) &= \dfrac{\sum_{n=1}^{N}\left(\sum_{i=1}^{4}x_{n+i}y_{n+i} + (\sum_{m=0}^{2}x_{n+m+5})(\sum_{m=0}^{2}y_{n+m+5})\right)}{5N-1} \\ &-\dfrac{5N}{5N-1}\left(\dfrac{\sum_{j=1}^{7N}x_{j}}{5N}\right)\left(\dfrac{\sum_{k=1}^{7N}y_{k}}{5N}\right)\\
+&= \dfrac{\sum_{n=1}^{N}\left(\sum_{i=1}^{4}x_{n+i}y_{n+i} + \sum_{m=0}^{2}\sum_{p=0}^{2}x_{n+m+5}y_{n+p+5}\right)}{5N-1} \\ &-\dfrac{5N}{5N-1}\left(\dfrac{\sum_{j=1}^{7N}x_{j}}{5N}\right)\left(\dfrac{\sum_{k=1}^{7N}y_{k}}{5N}\right)
+\end{aligned}
+\end{equation}
+Take an expectation,\par 
+\begin{equation}
+\begin{aligned}
+\mathbb{E}\{\hat{Cov}(X^{d},Y^{d})\} &=\mathbb{E}\{\dfrac{\sum_{n=1}^{N}\left(\sum_{i=1}^{4}x_{n+i}y_{n+i} + \sum_{m=0}^{2}\sum_{p=0}^{2}x_{n+m+5}y_{n+p+5}\right)}{5N-1}\}\\
+&=\dfrac{\mathbb{E}\{\sum_{n=1}^{N}\left(\sum_{i=1}^{4}x_{n+i}y_{n+i} + \sum_{m=0}^{2}x_{n+m+5}y_{n+m+5} \right)\}}{5N-1}\\
+&+\dfrac{\mathbb{E}\{\sum_{m=0}^{2}\sum_{p=0,p\neq m}^{2}x_{n+m+5}y_{n+p+5}\}}{5N-1}\\
+& = \dfrac{7N}{5N-1}Cov(x,y)
+\end{aligned}
+\end{equation}
+Since \par 
+\begin{equation}
+\hat{Cov}(X,Y) = \dfrac{\sum_{i=1}^{7N}\mathbb{E}(x_{i}y_{i})}{7N-1} - \dfrac{7N}{7N-1}\left(\dfrac{\sum_{i=1}^{7N}\mathbb{E}(x_{i})}{7N}\right)\left(\dfrac{\sum_{i=1}^{7N}\mathbb{E}(y_{i})}{7N}\right)
+\end{equation}
+
+\subsection{Weekly Estimation}
+Recall the formula (\ref{weekly}),\par 
+\begin{equation}
+\begin{aligned}
+X^{w}&=(\sum_{m=0}^{6}x_{n+m})_{n=1}^{N}\\
+Y^{w}&=(\sum_{m=0}^{6}y_{n+m})_{n=1}^{N}
+\end{aligned}
+\end{equation}\par 
+and its covariance is \par 
+\begin{equation}
+\begin{aligned}
+&\hat{Cov}(X^{w},Y^{w}) = \dfrac{\sum_{7N-6}^{n=1}\left(\sum_{m=0}^{6}x_{m+n}\sum_{m=0}^{6}y_{m+n}\right)}{7N-7} \\
+&-\dfrac{7N-6}{7N-7}\left(\dfrac{\sum_{n=1}^{7N-6}\sum_{i=n}^{n+6}x_{i}}{7N-6}\right)\left(\dfrac{\sum_{n=1}^{7N-6}\sum_{i=n}^{n+6}y_{i}}{7N-6}\right)
+\end{aligned}
+\end{equation}
+Take and expectation\par 
+\begin{equation}
+\begin{aligned}
+\mathbb{E}\{\hat{Cov}(X^{w},Y^{w}) \} &= \mathbb{E}\{\dfrac{\sum_{7N-6}^{n=1}\left(\sum_{m=0}^{6}x_{m+n}\sum_{m=0}^{6}y_{m+n}\right)}{7N-7}\} \\
+&- \mathbb{E}\left(\dfrac{7N-6}{7N-7}\left(\dfrac{\sum_{n=1}^{7N-6}\sum_{i=n}^{n+6}x_{i}}{7N-6}\right)\left(\dfrac{\sum_{n=1}^{7N-6}\sum_{i=n}^{n+6}y_{i}}{7N-6}\right)\right)\\
+&=\mathbb{E}\{\dfrac{\sum_{7N-6}^{n=1}\left(\sum_{m=0}^{6}\sum_{p=0}^{6}x_{m+n}y_{p+n}\right)}{7N-7}\}
+-\dfrac{36(7N-6)}{7N-7}\mathbb{E}\left(x\right)\mathbb{E}\left(y\right)\\
+&=\mathbb{E}\{\dfrac{\sum_{7N-6}^{n=1}\left(\sum_{m=0}^{6}x_{m+n}y_{m+n} + \sum_{m=0}^{6}\sum_{p=0,p\neq m}^{6}x_{m+n}y_{p+n}\right)}{7N-7}\}\\
+&-\dfrac{36(7N-6)}{7N-7}\mathbb{E}\left(x\right)\mathbb{E}\left(y\right)\\
+& = \dfrac{\sum_{n=1}^{7N-6}\sum_{m=0}^{6}\mathbb{E}(xy) + 0}{7N-7}-\dfrac{6(7N-6)^{2}}{7N-7}\mathbb{E}\left(x\right)\mathbb{E}\left(y\right)\\
+& = \dfrac{\sum_{n=1}^{7N-6}\sum_{m=0}^{6}(Cov(x,y) + \mathbb{E}(x)\mathbb{E}(y))}{7N-7}
+-\dfrac{36(7N-6)}{7N-7}\mathbb{E}\left(x\right)\mathbb{E}\left(y\right)\\
+& = \dfrac{6(7N-6)}{7N-7}(Cov(x,y) + \mathbb{E}(x)\mathbb{E}(y))
+-\dfrac{36(7N-6)}{7N-7}\mathbb{E}\left(x\right)\mathbb{E}\left(y\right)
+\end{aligned}
+\end{equation}
+
+\end{document}

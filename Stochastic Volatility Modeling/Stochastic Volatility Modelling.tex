@@ -1,0 +1,304 @@
+\documentclass[a4]{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{xcolor}
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{figures/}}
+\usepackage{graphicx}
+\title{Stochastic Volatility Modelling}
+\author{Cliff}
+
+% Make prettier tables.
+\usepackage{booktabs}
+
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{units}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+
+
+%%% Custom Commands
+%---------------------------------------------------------------------------
+% Concise referencing
+\newcommand{\eqnref}[1]{\eqref{#1}}
+\newcommand{\secref}[1]{Section \ref{#1}}
+\newcommand{\figref}[1]{Figure \ref{#1}}
+\newcommand{\lemref}[1]{Lemma \ref{#1}}
+\newcommand{\corref}[1]{Corollary \ref{#1}}
+\newcommand{\thmref}[1]{Theorem \ref{#1}}
+% Real numbers
+\newcommand{\Real}[1]{\mathbb{R}^{#1}}
+% Complex numbers
+\newcommand{\Complex}[1]{\mathbb{C}^{#1}}
+% Integers
+\newcommand{\Integer}[1]{\mathbb{Z}^{#1}}
+% Rank operator
+\DeclareMathOperator{\rank}{\textnormal{rank}}
+% Vec operator
+\newcommand{\vecop}{\textnormal{vec}}
+% Norm
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+% Trace
+\newcommand{\trace}{\textnormal{tr}}
+% Range
+\newcommand{\range}{\textnormal{range}}
+% Partial derivative
+\newcommand{\pd}[2]{\dfrac{\partial #1}{\partial #2}}
+% Complete derivative
+\newcommand{\dd}[2]{\dfrac{d #1}{d #2}}
+% Complete derivative, second order
+\newcommand{\dds}[2]{\dfrac{d^2 #1}{d {#2}^2}}
+% Limit to N / N
+\newcommand{\limover}[1]{\lim_{#1 \rightarrow \infty} \dfrac{1}{#1}}
+% Display style sum
+\newcommand{\dsum}{\displaystyle\sum}
+% arg min and arg max
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg~max}}}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg~min}}}
+%---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{example}
+\newtheorem{corollary}{Corollary}
+\begin{document}
+\tableofcontents
+\newpage
+\maketitle
+\section{Introduction}
+\subsection{Characterizing a usable model-the Black-Sholes equation}
+In trading floor it's really important to get a correct pricing, but the question is that how to evaluate a valid model. There are several standards,\par 
+\begin{itemize}
+	\item Consistent with the terminal payoff: $f(T,S(T)) = P(T,S(T)),\forall S$.\\
+	\item Able to do risk-neutral hedging.\\
+\end{itemize}
+Let's consider a scenario of shorting options through delta-hedging, \par 
+\begin{equation}
+P\&L = \underbrace{-[P(t+\delta t, S + \delta S) - P(t,S)]}_\text{PnL from shorting option} + \underbrace{rP(t,S)\delta t}_\text{interest accrued from money account} - \underbrace{\Delta [(r-q)S\delta t -\delta S]}_\text{PnL from hedging}
+\end{equation}\par 
+and write as differential form and using $\Delta = \frac{\partial P}{\partial S}$\par 
+\begin{equation}
+\begin{aligned}
+P\&L &=\frac{\partial P}{\partial t}dt - \frac{\partial P}{\partial S}dS - \dfrac{1}{2}S^{2}\frac{\partial^{2} P}{\partial S^{2}}(\frac{d S}{S})^{2} + rPdt -  \dfrac{\partial P}{\partial S} [(r-q)Sdt - dS]\\
+&=  -\underbrace{[\frac{\partial P}{\partial t} + (r-q)S\dfrac{\partial P}{\partial S} -rP]dt}_\text{theta portion}- \underbrace{\dfrac{1}{2}S^{2}\frac{\partial^{2} P}{\partial S^{2}}(\frac{d S}{S})^{2} }_\text{gamma portion}
+\end{aligned}
+\end{equation}\par
+\bigbreak 
+\subsubsection{Single Asset Case}
+\noindent Our daily PnL reads,\par 
+\begin{equation}\label{PnL}
+P\&L = -A(t,S)\delta t - B(t,S)(\frac{\delta S}{S})^{2}
+\end{equation} \par 
+In order to be risk-neutral, there should be some constraints on $A(t,S)$ and $B(t,S)$. First, $A$ and $B$ cannot be both positive or negative. Second, they should obey an equation: $\frac{\delta S}{S}=\pm \sqrt{-\frac{A(t,S)}{B(t,S)}}\sqrt{\delta t}$. If we assume underlying S satisfies a lognormal distribution, and we could have $\left\langle \left( \frac{\delta S}{S}\right)^{2}\right\rangle =\hat{\sigma}^{2}\delta t$, where $\hat{\sigma}$ is the average of historical volatility. \par 
+\bigbreak 
+Then we could get an approximation of $A(t,S)$ through $A(t,S)=-\hat{\sigma}^{2}B(t,S)$, and substitute it into equation (\ref{PnL}),\par 
+\begin{equation}\label{PnL_vol}
+P\&L = -\dfrac{S^{2}}{2}\dfrac{\partial^{2}P_{\hat{\sigma}}}{\partial S^{2}}\left(\dfrac{\delta S^{2}}{S^{2}}-\hat{\sigma}^{2}\delta t\right)
+\end{equation}
+\subsubsection{Multiple Assets Case}
+\begin{equation}
+P\&L = -A(t,S)\delta t - \frac{1}{2}\sum_{ij}\phi_{ij}(t,S)\dfrac{\delta S_{i}}{S_{i}}\dfrac{\delta S_{j}}{S_{j}}
+\end{equation}\par 
+where $\phi_{ij}(t,S) = S_{i}S_{j}\dfrac{d^{2}P}{dS_{i}dS_{j}}|_{t,S}$ and S denotes the vector of $S_{i}$. Using eigenvalue decomposition,\par 
+\begin{equation}
+\phi = T\mathcal{\varphi}T^{T}
+\end{equation}\par 
+furthermore, \par 
+\begin{equation}
+\begin{aligned}
+\varphi = \{\dfrac{d^{2}P}{dS_{i}dS_{j}}\}_{i,j\in \{0,..,n\}}\\
+and\\
+T = (S_{i})_{i\in \{0,...,n\}}
+\end{aligned}
+\end{equation}
+The gamma portion of our $P\&L$ can be written as\par 
+\begin{equation}
+\sum_{ij}\phi_{ij}\dfrac{\delta S_{i} }{S_{i}}\dfrac{dS_{j}}{S_{j}} = U^{T}\phi U = U^{T}T\varphi T^{T}U = (T^{T}U)^{T}\varphi (T^{T}U)
+\end{equation}
+where $U = \{\dfrac{\delta S_{i}}{S_{i}}\}$ and $\delta z_{k}=T_{k}^{T}U$. our PnL reads:\par 
+\begin{equation}
+P\&L = -A\delta t -\frac{1}{2}\sum_{k}\varphi_{k}\delta z_{k}^{2}
+\end{equation}\par 
+As in mono-asset case, the condition for our model to be usable is\par 
+\begin{equation}	
+A = -\frac{1}{2}\sum_{k}\varphi_{k}w_{k}
+\end{equation}\par 
+\noindent so our PnL reads:\par 
+\begin{equation}
+P\&L = -\frac{1}{2}\sum_{k}\varphi_{k}(\delta z_{k}^{2}-w_{k}\delta t)
+\end{equation}\par 
+Let us express A differently, so as to give our P\&L a more symmetric form.\par 
+\begin{equation}
+	A = -\frac{1}{2} \sum_{k}\varphi_{k}\omega_{k} = -\frac{1}{2}tr(\varphi \omega)=-\frac{1}{2}tr(T^{T}\phi T\omega )=-\frac{1}{2}tr(\phi T\omega T^{T})=-\frac{1}{2}tr(\phi C) = -\frac{1}{2}\sum_{ij}\phi_{ij}C_{ij}
+\end{equation}\par 
+where $C = T\omega T^{T}$ is a positive matrix by construction,\par 
+\begin{equation}
+A=-\frac{1}{2}\sum_{k}\
+phi_{k}(\dfrac{\delta S_{i} }{S_{i}}\dfrac{dS_{j}}{S_{j}}-C_{ij}\delta t)
+\end{equation}
+Because C is a positive matrix, it can be interpreted as an (implied) covariance matrix.\par 
+\subsubsection{Conclusion}
+In the general case of multiple hedge instruments, the condition that our model is usable - no situation in which our carry P\&L is systematically positive or negative- is that there exists a positive break-even covariance matrix $ C(t,S),\forall S, \forall t$.\par 
+In addition, only suitable model can be used in the trading purposes, which called market model.
+\subsection{How (in)effective is delta hedging}
+The attitude of this section is to verify the average and standard deviation of P\&L incurred over option's life.\par 
+\noindent We start from the Black-Sholes assumption:\par 
+\begin{itemize}
+	\item The underlying follows a lognormal process with constant volatility $\sigma$ same as implied volatility in option pricing and risk management.\\
+	\item The hedging interval is approaching to zero, $\delta \rightarrow 0$.
+\end{itemize}
+So, the sum of P\&Ls vanishes with probability one.\par 
+However, in real-time life, the analysis should be more complex. Let's reduce the restrictions step by step.\par 
+\bigbreak 
+\noindent \textbf{Step 1}\par 
+The dollar gamma weighted implied volatility equals future realized volatility over the option's life.\par 
+\begin{equation}
+\left\langle \int^{T}_{0}e^{-rt}S^{2}\dfrac{d^{2}P_{\hat{\sigma}}}{dS^{2}}\sigma_{t}^{2}dt\right \rangle = \left \langle \int^{T}_{0}e^{-rt}S^{2}\dfrac{d^{2}P_{\hat{\sigma}}}{dS^{2}}\hat{\sigma}^{2}dt\right \rangle \end{equation}\par 
+with the above condition holds, our final P\&L is not biased on average and let us concentrated on dispersion.\par 
+\bigbreak 
+\noindent \textbf{Step 2}\par 
+Assume that the option is delta-hedging daily at times $t_{i}: \delta t=1$ day. Recall (\ref{PnL_vol}):\par 
+\begin{equation}
+P\&L = -\sum_{i}e^{-rt_{i}}\dfrac{S_{i}^{2}}{2}\dfrac{d^{2}P_{\hat{\sigma}}}{dS^{2}}(t_{i},S_{i})(r_{i}^{2}-\hat{\sigma}^{2}\delta t)
+\end{equation}\par 
+where $r_{i}$ are daily returns, given by $r_{i}=\dfrac{S_{i+1}-S_{i}}{S_{i}}$. It is dependent on the option's payoff since it related with gamma.\par 
+\bigbreak
+\noindent \textbf{Step 3}\par 
+\bigbreak 
+In addition, we assume option's discounted dollar gamma is constant, and $e^{-rt_{i}}S^{2}\dfrac{d^{2}P_{\hat{\sigma}}}{dS^{2}}=\text{initial value: } S_{0}^{2}\dfrac{d^{2}P_{\hat{\sigma}}}{dS^{2}}(t_{0},S_{0})$. Let's write the daily return $r_{i}$ as:\par 
+\begin{equation}
+r_{i} =\sigma_{i}\sqrt{\delta t}z_{i},\quad \langle z_{i}\rangle =0,\quad \langle z^{2}_{i}\rangle =1
+\end{equation}\par 
+\bigbreak 
+\noindent Let's assume $z_{i}$ is iid and independent with $\sigma_{i}$, our P\&L:\par 
+\begin{equation}
+P\&L = -\sum_{i}e^{-rt_{i}}\dfrac{S_{i}^{2}}{2}\dfrac{d^{2}P_{\hat{\sigma}}}{dS^{2}}(t_{i},S_{i})(\sigma_{i}^{2}z_{i}^{2}-\hat{\sigma}^{2}\delta t)
+\end{equation}\par 
+\bigbreak 
+\noindent \textbf{Step 4}\par 
+Let's assume $\sigma_{i}$ is time-homogeneous, so that, $\sigma_{i}$ is independent with i and has $\hat{\sigma}^{2}=\langle \sigma_{i}^{2}\rangle$. The variance of $\sum_{i}(\sigma_{i}^{2}z_{i}^{2}-\hat{\sigma}^{2})\delta t$ is given by:\par 
+\begin{equation}
+\begin{array}{l}
+\left\langle\sum_{i j}\left(\sigma_{i}^{2} z_{i}^{2}-\widehat{\sigma}^{2}\right) \delta t\left(\sigma_{j}^{2} z_{j}^{2}-\widehat{\sigma}^{2}\right) \delta t\right\rangle \\
+\\
+=\sum_{i}\left(\left\langle\sigma_{i}^{4} z_{i}^{4}\right\rangle+\widehat{\sigma}^{4}-2 \widehat{\sigma}^{4}\right) \delta t^{2}+\sum_{i \neq j}\left\langle\sigma_{i}^{2} \sigma_{j}^{2} z_{i}^{2} z_{j}^{2}+\widehat{\sigma}^{4}-2 \widehat{\sigma}^{4}\right\rangle \delta t^{2} \\
+\\
+=\sum_{i}(2+\kappa) \widehat{\sigma}^{4} \delta t^{2}+\sum_{i \neq j}\left(\left\langle\sigma_{i}^{2} \sigma_{j}^{2}\right\rangle-\widehat{\sigma}^{4}\right) \delta t^{2} \\
+\\
+=\sum_{i}(2+\kappa) \widehat{\sigma}^{4} \delta t^{2}+\left(\left\langle\sigma^{4}\right\rangle-\widehat{\sigma}^{4}\right) \sum_{i \neq j} f_{i j} \delta t^{2} \\
+\\
+=\widehat{\sigma}^{4}\left(\sum_{i}(2+\kappa) \delta t^{2}+\Omega \sum_{i \neq j} f_{i j} \delta t^{2}\right)
+\end{array}
+\end{equation}\par 
+where the kurtosis $\kappa$ and variance correlation function $f_{ij}$ is given by:\par 
+\begin{equation}
+\kappa=\frac{\left\langle\sigma_{i}^{4} z_{i}^{4}\right\rangle}{\widehat{\sigma}^{4}}-3, \quad f_{i j}=\frac{\left\langle\left(\sigma_{i}^{2}-\widehat{\sigma}^{2}\right)\left(\sigma_{j}^{2}-\widehat{\sigma}^{2}\right)\right\rangle}{\sqrt{\left\langle\sigma_{i}^{4}\right\rangle-\widehat{\sigma}^{4}} \sqrt{\left\langle\sigma_{j}^{4}\right\rangle-\widehat{\sigma}^{4}}}
+\end{equation}
+and dimensionless factor,
+\begin{equation}
+\Omega=\frac{\left\langle\sigma^{4}\right\rangle-\widehat{\sigma}^{4}}{\widehat{\sigma}^{4}}=\frac{\left\langle\sigma^{4}\right\rangle-\left\langle\sigma^{2}\right\rangle^{2}}{\left\langle\sigma^{2}\right\rangle^{2}}
+\end{equation}
+In the end, the standard deviation is given by\par 
+\begin{equation}
+\operatorname{StDev}(P \& L)=\left|\frac{S_{0}^{2}}{2} \frac{d^{2} P_{\widehat{\sigma}}}{d S^{2}}\left(t_{0}, S_{0}\right)\right| \sqrt{\widehat{\sigma}^{4}\left(\sum_{i}(2+\kappa) \delta t^{2}+\Omega \sum_{i \neq j} f_{i j} \delta t^{2}\right)}
+\end{equation}
+\bigbreak 
+\noindent \textbf{Step 5}\par 
+We know the vega and gamma has the following relationship according to the Black-Sholes formula\par 
+
+\begin{equation}
+\frac{d P_{\widehat{\sigma}}}{d \widehat{\sigma}}=S^{2} \frac{d^{2} P_{\widehat{\sigma}}}{d S^{2}} \widehat{\sigma} T
+\end{equation}
+Using Vega, the standard deviation of PnL is \par 
+\begin{equation}\label{std_pnl}
+\operatorname{StDev}(P \& L)=\left|\widehat{\sigma} \frac{d P_{\widehat{\sigma}}}{d \widehat{\sigma}}\right| \frac{1}{2 T} \sqrt{\sum_{i}(2+\kappa) \delta t^{2}+\Omega \sum_{i \neq j} f_{i j} \delta t^{2}}
+\end{equation}
+\subsection{The Black-Scholes case}
+Let's first assume that S follows the lognormal Black-Scholes dynamics $\sigma_{i}$, is constant and equal to $\hat{\sigma}$. So, $\Omega = 0, \kappa = 0,f = 0$.
+\begin{equation}\label{normstd}
+StDev(P\&L) = \dfrac{1}{2N}\left|\hat{\sigma}\dfrac{dP_{\hat{\sigma}}}{d\hat{\sigma}}\right|
+\end{equation}\par 
+\noindent Note that $\dfrac{\hat{\sigma}}{\sqrt{2N}}$  is approximately the standard deviation of the historical volatility estimator. The historical volatility estimator is given by:\par 
+\begin{equation}
+\bar{\sigma}^{2} = \dfrac{1}{N\delta t}\sum_{i}\left(\dfrac{S_{i+1} - S_{i}}{S_{i}}\right)^{2}
+\end{equation}\par 
+In the Black-Scholes assumption, daily return is assumed as Gaussian distribution.\par 
+\begin{equation}
+\bar{\sigma}^{2}\approxeq \dfrac{\hat{\sigma}^{2}}{N}\sum_{i}z_{i}^{2}
+\end{equation}\par 
+And we know $Var(\hat{\sigma}^{2}) = \dfrac{2\hat{\sigma}^{2}}{N}$ since\par 
+\begin{equation}
+\begin{aligned}
+Var(\hat{\sigma}^{2}) &= Var\left(\dfrac{\hat{\sigma}^{2}}{N}\sum_{i}z_{i}^{2}\right)\\
+&=\dfrac{\hat{\sigma}^{4}}{N^{2}}\sum_{i}Var(z_{i}^{2})\\
+&=\dfrac{\hat{\sigma}^{4}}{N}\left[E(z_{i}^{4})-E(z_{i}^{2})^{2}\right]
+\end{aligned}
+\end{equation}\par 
+Then since the moment-generating-function of normal distribution is, $mgf(t)=\exp(\mu t + \dfrac{\sigma^{2}}{2})$ and let $\mu = 0$\par 
+\begin{equation}
+\begin{aligned}
+mgf^{(1)}(t)&=\sigma^{2}t\exp(\dfrac{\sigma^{2}t^{2}}{2})\\
+mgf^{(2)}(t)&=(\sigma^{2}+\sigma^{4}t^{2})\exp(\dfrac{\sigma^{2}t^{2}}{2})\\
+mgf^{(3)}(t)&=(\sigma^{6}t^{3}+3\sigma^{4}t )\exp(\dfrac{\sigma^{2}t^{2}}{2})\\
+mgf^{(4)}(t)&=(\sigma^{8}t^{4} + 6\sigma^{6}t^{2}+3\sigma^{4})\exp(\dfrac{\sigma^{2}t^{2}}{2})\\
+mgf^{(4)}(0) = 3\sigma^{4}=3
+\end{aligned}
+\end{equation}
+So, the variance of historical volatility estimator is\par 
+$$
+Var(\hat{\sigma}^{2})=\dfrac{\hat{\sigma}^{4}}{N}\left[3-1\right]=\dfrac{2\hat{\sigma}^{4}}{N}
+$$\par 
+\bigbreak 
+\noindent The relative standard deviation $StDev(\bar{\sigma}^{2})/\langle\bar{\sigma}^{2}\rangle =\sqrt{\frac{2}{N}}$, \textcolor{red}{if it is not too large, the relative standard deviation of historical volatility estimator is half of this}, $\frac{1}{\sqrt{2N}}$.\par 
+\bigbreak 
+\noindent Given the above conclusion, the StDev(P\&L) is approximately vega multiplies the standard deviation of historical volatility estimator with the same hedging schedule.\par
+\begin{example}
+	Let's assume a one-year ATM option with $\hat{\sigma}=20\%, S=1, P = 7.97\%\quad N=250$. As a result, $\frac{1}{\sqrt(2N)}\approx0.045$. And there are 2 Golden Thumb: (1) $P_{\hat{\sigma}}\approx \frac{1}{\sqrt{2\pi}}S\hat{\sigma}\sqrt{T}$; (2)$\hat{\sigma}\dfrac{dP_{\hat{\sigma}}}{d\hat{\sigma}}\approx P$. And it implies the StDev(P\&L) = 0.045P, which is approximately $5\%$ premium. And the bid/ask spread is approximately 10 \%.
+\end{example} 
+\subsubsection{The real case}
+\paragraph{Analysis}
+In real life, the $\sigma_{i}$ is not constantly equal to $\hat{\sigma}$ and $f_{ij}$ will not vanish. We assume the dynamics is time-homogeneous. Then variance correlation function $f_{ij}$ is the function of the difference $|i-j|$.
+\begin{equation}
+\sum_{ij}f_{ij}\delta t^{2}\approx \int^{T}_{0}du\int^{T}_{0}dtf(t-u) = 2\int^{T}_{0}f(T-\tau)f(\tau)
+\end{equation}\par 
+We now have the from (\ref{std_pnl}):\par 
+\begin{equation}
+\label{real_std_pnl}
+\begin{aligned}
+StDev(P\&L)&\approx |\hat{\sigma}\dfrac{dP_{\hat{\sigma}}}{d\hat{\sigma}}|\frac{1}{2T}\sqrt{(2+\kappa)\frac{T^{2}}{N}+2\Omega\int^{T}_{0}(T-\tau)f(\tau)d\tau}\\
+&=|\hat{\sigma}\dfrac{dP_{\hat{\sigma}}}{d\hat{\sigma}}|\sqrt{\dfrac{2+\kappa}{4N}+\dfrac{\Omega}{2T^{2}}\int^{T}_{0}(T-\tau)f(\tau)d\tau}
+\end{aligned}
+\end{equation}
+\bigbreak 
+\noindent Now we can investigate the two contributors to StDev(P\&L).\par 
+\begin{itemize}
+\item The first part: Let's assume the daily variances are constant, so $\Omega$ vanishes. It is similar in (\ref{normstd}), but the $\kappa$ is not zero.\\
+\item The second part: the prefactor $\Omega$ quantifies the dispersion of daily variances while $f(\tau)$ quantifies how a fluctuation in daily variance $\sigma_{i}$ on day $t_{i}$ impacts daily variances $\sigma_{i+\tau}^{2}$ on subsequent days.
+\begin{equation}
+\Omega=\frac{\left\langle\sigma^{4}\right\rangle-\left\langle\sigma^{2}\right\rangle^{2}}{\left\langle\sigma^{2}\right\rangle^{2}}, \text{ and } f_{i j}=\frac{\left\langle\left(\sigma_{i}^{2}-\widehat{\sigma}^{2}\right)\left(\sigma_{j}^{2}-\widehat{\sigma}^{2}\right)\right\rangle}{\sqrt{\left\langle\sigma_{i}^{4}\right\rangle-\widehat{\sigma}^{4}} \sqrt{\left\langle\sigma_{j}^{4}\right\rangle-\widehat{\sigma}^{4}}}
+\end{equation}\par 
+Thus, if $\Omega$ vanishes slowly then the daily variance would be strongly correlated. If we say that $\sigma_{i}$ is higher than $\hat{\sigma}$, the daily variances $\sigma_{j}$ will be likely higher than $\hat{\sigma}$. It will cause the daily P\&L keeps the same sign which generating strong correlation among daily P\&Ls:\par 
+\begin{equation}\label{PnL_vol}
+P\&L = -\dfrac{S^{2}}{2}\dfrac{\partial^{2}P_{\hat{\sigma}}}{\partial S^{2}}\left(\dfrac{\delta S^{2}}{S^{2}}-\hat{\sigma}^{2}\delta t\right)
+\end{equation}
+and increasing the variance of our final P\&L. (see Figure \ref{fig:screenshot005} and Eq \ref{real_std_pnl})
+\begin{figure}\label{fig1}
+	\centering
+	\includegraphics[width=0.3\linewidth]{screenshot005}
+	\caption{Final PnL}
+	\label{fig:screenshot005}
+\end{figure}
+\begin{example}
+	Set $f(\tau)=1$, then we have the second piece of (\ref{real_std_pnl}) is $\frac{\Omega}{4}$. If $\Omega$ is small, the impact of this term is equivalent to the impact of a relative displacement of $\hat{\sigma}$ by $\hat{\sigma}\frac{\sqrt{\Omega}}{2}$, regardless of the number N of daily rehedges. (For this sentence consider the Taylor expansion on $\sqrt{\Delta x}$)
+\end{example}
+\end{itemize}
+\paragraph{Estimating $f(\tau), \Omega, \kappa$}
+\end{document}
